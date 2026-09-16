@@ -1,7 +1,7 @@
 /* Piggy — service worker.
    Strategia: dokument z sieci (żeby aktualizacje docierały od razu),
    cache wyłącznie jako zapas na brak zasięgu. Reszta plików cache-first. */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE   = 'piggy-' + VERSION;
 const ASSETS  = [
   './', './index.html', './manifest.webmanifest',
@@ -44,9 +44,13 @@ self.addEventListener('fetch', e => {
   if (url.origin !== location.origin) return;
 
   // Sam dokument — sieć najpierw. Inaczej aktualizacja apki nigdy by do niej nie dotarła.
+  //
+  // cache:'no-store' jest tu kluczowe: zwykłe fetch(req) pyta najpierw cache HTTP
+  // przeglądarki, a ten (przez Cache-Control: max-age=600 z GitHub Pages) potrafi
+  // przez 10 minut oddawać starą stronę. Wtedy "sieć najpierw" jest fikcją.
   if (req.mode === 'navigate' || req.destination === 'document') {
     e.respondWith(
-      fetch(req).then(res => {
+      fetch(req.url, { cache: 'no-store', credentials: 'same-origin' }).then(res => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put('./index.html', copy));
         return res;
