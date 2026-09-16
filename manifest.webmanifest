@@ -1,6 +1,6 @@
 {
-  "name": "Miarka — kalorie i makro",
-  "short_name": "Miarka",
+  "name": "Piggy — kalorie i makro",
+  "short_name": "Piggy",
   "description": "Licznik kalorii i makroskładników z produktami z Lidla i Biedronki.",
   "lang": "pl",
   "start_url": "./",

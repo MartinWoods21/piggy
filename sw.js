@@ -1,8 +1,8 @@
-/* Miarka — service worker.
+/* Piggy — service worker.
    Strategia: dokument z sieci (żeby aktualizacje docierały od razu),
    cache wyłącznie jako zapas na brak zasięgu. Reszta plików cache-first. */
-const VERSION = 'v1';
-const CACHE   = 'miarka-' + VERSION;
+const VERSION = 'v2';
+const CACHE   = 'piggy-' + VERSION;
 const ASSETS  = [
   './', './index.html', './manifest.webmanifest',
   './icon-32.png', './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'

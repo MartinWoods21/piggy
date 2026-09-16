@@ -1,4 +1,4 @@
-# Miarka
+# Piggy
 
 Licznik kalorii i makroskładników po polsku. Jeden plik HTML, bez backendu, bez konta,
 bez śledzenia. Zrobiony pod telefon.

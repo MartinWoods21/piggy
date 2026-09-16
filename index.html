@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F2F1F3">
 <meta name="description" content="Licznik kalorii i makroskładników po polsku — produkty z Lidla i Biedronki, plan treningów, atlas ćwiczeń. Dane zostają na Twoim telefonie.">
-<title>Miarka — kalorie i makro</title>
+<title>Piggy — kalorie i makro</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon-32.png" sizes="32x32" type="image/png">
@@ -13,14 +13,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Miarka">
+<meta name="apple-mobile-web-app-title" content="Piggy">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
 <style>
 /* ============================================================
-   Miarka × Jitter — Swiss studio na telefonie.
+   Piggy × Jitter — Swiss studio na telefonie.
    Kanwa off-white, białe pigułki unoszące się na wielowarstwowym
    cieniu, fiolet jako jedyna iskra, Inter Tight na duże liczby.
    Motyw: wyłącznie jasny (zgodnie ze specyfikacją).
@@ -1157,7 +1157,7 @@ function guessMeal(){
 function renderTip(){
   const t=$('#tip'); t.innerHTML='';
   if(S.settings.tipSeen) return;
-  const b=el('div','banner',`<div class="t"><b>Dodaj Miarkę do ekranu głównego</b>
+  const b=el('div','banner',`<div class="t"><b>Dodaj Piggy do ekranu głównego</b>
     <p>W przeglądarce: <b>Udostępnij → Do ekranu początkowego</b> (iPhone) albo <b>⋮ → Dodaj do ekranu głównego</b> (Android). Będzie działać jak zwykła apka.</p>
     <button id="tipOk">Rozumiem</button></div>`);
   t.appendChild(b);
@@ -1294,7 +1294,7 @@ function renderMe(){
       <p class="note">Wszystko siedzi <b>tylko na tym telefonie</b>, w pamięci przeglądarki. Nic nie leci na żaden serwer. Czyszczenie danych przeglądarki skasuje też dziennik — dlatego kopia.</p>
       <div class="btn-row"><button class="btn danger" id="wipe">Wyczyść wszystkie dane</button></div>
     </section>
-    <p class="note" style="margin-top:22px;text-align:center">Miarka · wartości odżywcze są przybliżone i mają charakter orientacyjny.<br>Nie zastępują porady dietetyka ani lekarza.</p>
+    <p class="note" style="margin-top:22px;text-align:center">Piggy · wartości odżywcze są przybliżone i mają charakter orientacyjny.<br>Nie zastępują porady dietetyka ani lekarza.</p>
   `;
 
   const bind=(id,key,int,marks)=>{
