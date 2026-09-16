@@ -3,7 +3,7 @@
 Licznik kalorii i makroskładników po polsku. Jeden plik HTML, bez backendu, bez konta,
 bez śledzenia. Zrobiony pod telefon.
 
-**Apka:** https://martinwoods21.github.io/miarka/
+**Apka:** https://martinwoods21.github.io/piggy/
 
 ## Co potrafi
 
