@@ -1,0 +1,2807 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F1F3">
+<meta name="description" content="Licznik kalorii i makroskładników po polsku — produkty z Lidla i Biedronki, plan treningów, atlas ćwiczeń. Dane zostają na Twoim telefonie.">
+<title>Miarka — kalorie i makro</title>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Miarka">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* ============================================================
+   Miarka × Jitter — Swiss studio na telefonie.
+   Kanwa off-white, białe pigułki unoszące się na wielowarstwowym
+   cieniu, fiolet jako jedyna iskra, Inter Tight na duże liczby.
+   Motyw: wyłącznie jasny (zgodnie ze specyfikacją).
+   ============================================================ */
+:root{
+  color-scheme:light;
+
+  /* — kanwa i powierzchnie — */
+  --ground:#F2F1F3;        /* Studio Off-White */
+  --surface:#FFFFFF;       /* Pure White */
+  --surface-2:#F4F3F6;     /* wgłębione pola wewnątrz kart */
+  --surface-3:#E5E4E7;     /* Hairline Gray — tory pasków, wypełnienia */
+  --line:#E5E4E7;
+  --line-strong:#D6D5DA;
+
+  /* — tusz — */
+  --ink:#19171C;           /* Ink */
+  --ink-2:#6E6E73;         /* Slate */
+  --ink-3:#6E6E73;         /* tekst wtórny = Slate; spec przypisuje mu właśnie "secondary descriptive text" */
+  --ink-4:#97979B;         /* Soft Mist — placeholdery, ikony dekoracyjne */
+  --plum:#17082C;          /* Deep Plum */
+
+  /* — iskra — */
+  --accent:#7A40ED;        /* Eclipse Violet */
+  --accent-2:#6733D6;
+  --accent-soft:#F0E9FE;
+  --on-accent:#FFFFFF;
+  --lilac:#A981FF;         /* Lilac Wash */
+  --lavender:#CAB3F8;      /* Lavender Mist */
+
+  /* — makro: fiolet / błękit / volt (bez czwartego akcentu) — */
+  --p:#7A40ED;  --p-soft:#F0E9FE;
+  --c:#00B2FF;  --c-soft:#E6F4FF;
+  --c-ink:#0071AE;         /* czytelny odpowiednik Electric Blue dla tekstu */
+  --f:#E2EF35;  --f-soft:#FAFFD1;
+  --f-ink:#6B7400;         /* czytelny odpowiednik Volta dla tekstu */
+
+  /* — status: jedyny kolor spoza systemu, uzasadniony w opisie — */
+  --over:#D32C4C;
+  --over-soft:#FDECEF;
+  --warn:#B4681A;
+
+  /* — cienie: wielowarstwowe, rozmyte (sygnatura systemu) — */
+  --shadow:
+    rgba(25,23,28,.01) 0px 63px 25px 0px,
+    rgba(25,23,28,.05) 0px 35px 21px 0px,
+    rgba(25,23,28,.05) 0px 16px 16px 0px,
+    rgba(25,23,28,.06) 0px 4px 9px 0px;
+  --shadow-hero:
+    rgba(25,23,28,.01) 0px 119px 48px 0px,
+    rgba(25,23,28,.05) 0px 67px 40px 0px,
+    rgba(25,23,28,.07) 0px 30px 30px 0px,
+    rgba(25,23,28,.08) 0px 7px 16px 0px;
+  --sheet-shadow:
+    rgba(25,23,28,.01) 0px -152px 61px 0px,
+    rgba(25,23,28,.05) 0px -85px 51px 0px,
+    rgba(25,23,28,.09) 0px -38px 38px 0px,
+    rgba(25,23,28,.10) 0px -9px 21px 0px;
+
+  /* — geometria pigułki — */
+  --r-card:34px;
+  --r-nested:24px;
+  --r-input:26px;
+  --r-pill:50px;
+  --r-nav:20px;
+  --r:var(--r-card);
+
+  --display:'Inter Tight','Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --ui:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+
+img{max-width:100%}
+[hidden]{display:none!important}   /* wrapper Artifactu dawał to za darmo; tu musi być jawnie,
+                                      bo .searchbox .clr ma display:grid i nadpisałoby styl UA */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--ui); font-size:16px; line-height:1.5; letter-spacing:-.02em;
+  -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
+  overscroll-behavior-y:none;
+}
+button,input,select,textarea{font:inherit; color:inherit; letter-spacing:inherit}
+button{cursor:pointer; border:0; background:none}
+:focus-visible{outline:2.5px solid var(--accent); outline-offset:3px; border-radius:12px}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- powłoka ---------- */
+.app{
+  max-width:460px; margin:0 auto; min-height:100%;
+  background:var(--ground); display:flex; flex-direction:column;
+  padding-bottom:calc(104px + env(safe-area-inset-bottom));
+}
+@media (min-width:620px){
+  body{background:#E9E8EC}
+  .app{min-height:100vh; box-shadow:0 0 90px -40px rgba(25,23,28,.25)}
+}
+main{display:none; padding:0 16px 32px}
+main.on{display:block}
+#v-lib,#v-plan,#v-atlas,#v-me{padding-top:calc(14px + env(safe-area-inset-top))}
+
+/* ---------- górny pasek ---------- */
+.top{
+  position:sticky; top:0; z-index:30; background:var(--ground);
+  padding:calc(12px + env(safe-area-inset-top)) 16px 10px;
+  transition:box-shadow .2s;
+}
+.top.stuck{box-shadow:0 12px 20px -18px rgba(25,23,28,.5)}
+.datebar{display:flex; align-items:center; gap:8px}
+.datebar h1{
+  flex:1; margin:0; font-family:var(--display); font-size:21px; font-weight:700;
+  letter-spacing:-.03em; text-align:center; line-height:1.15; padding:4px 0;
+}
+.datebar h1 small{
+  display:block; font-family:var(--ui); font-size:12px; font-weight:500; letter-spacing:0;
+  color:var(--ink-3); margin-top:2px; text-transform:none;
+}
+.navbtn{
+  width:44px; height:44px; border-radius:var(--r-pill); display:grid; place-items:center;
+  color:var(--ink); background:var(--surface); flex:none; box-shadow:var(--shadow);
+}
+.navbtn:active{background:var(--surface-2)}
+.navbtn[disabled]{opacity:.3; box-shadow:none; background:var(--surface-3)}
+.navbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- karta podsumowania (hero) ---------- */
+.sum{
+  background:var(--surface); border-radius:var(--r-card); padding:24px 22px 22px;
+  margin-top:14px; box-shadow:var(--shadow-hero);
+}
+.sum-head{display:flex; align-items:flex-end; justify-content:space-between; gap:14px}
+.kcal-left{display:flex; align-items:baseline; gap:9px; min-width:0}
+.kcal-left b{
+  font-family:var(--display); font-size:60px; font-weight:800; letter-spacing:-.045em;
+  line-height:.9; font-variant-numeric:tabular-nums;
+}
+.kcal-left span{font-size:13px; color:var(--ink-2); font-weight:500; letter-spacing:-.01em; line-height:1.3}
+.kcal-meta{text-align:right; font-size:12px; color:var(--ink-3); line-height:1.4; flex:none}
+.kcal-meta b{display:block; font-size:14px; color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums}
+
+/* pigułka „kicker” nad sekcją — Lavender Mist wg systemu */
+.label{
+  display:inline-block; background:var(--lavender); color:var(--plum);
+  font-size:12px; font-weight:600; letter-spacing:-.01em; text-transform:none;
+  padding:5px 14px; border-radius:var(--r-pill);
+}
+
+.track{height:12px; border-radius:var(--r-pill); background:var(--surface-3); overflow:hidden; margin:20px 0 6px; display:flex}
+.track i{display:block; height:100%; transition:width .35s cubic-bezier(.3,.8,.35,1)}
+.track i.over{background:var(--over)}
+.seg-p{background:var(--p)} .seg-c{background:var(--c)} .seg-f{background:var(--f)}
+.track-note{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-3)}
+
+.macros{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:18px}
+.macro{background:var(--surface-2); border-radius:var(--r-nested); padding:12px 12px 13px}
+.macro .mh{display:flex; align-items:center; gap:6px; font-size:12px; font-weight:500; color:var(--ink-2)}
+.macro .dot{width:8px;height:8px;border-radius:99px;flex:none;box-shadow:inset 0 0 0 1px rgba(25,23,28,.14)}
+.macro .mv{font-family:var(--display); font-size:21px; font-weight:700; letter-spacing:-.03em; margin-top:5px;
+  font-variant-numeric:tabular-nums; color:var(--ink)}
+.macro .mv u{text-decoration:none; font-size:12px; font-weight:500; color:var(--ink-3); font-family:var(--ui); letter-spacing:-.01em}
+.mbar{height:5px; border-radius:99px; background:var(--surface-3); margin-top:9px; overflow:hidden}
+.mbar i{display:block; height:100%; border-radius:99px}
+
+.daytype{
+  display:inline-flex; align-items:center; gap:7px; padding:7px 14px; border-radius:var(--r-pill);
+  margin-bottom:16px; background:var(--surface-2); font-size:12px; font-weight:600; color:var(--ink-2);
+}
+.daytype.train{background:var(--accent-soft); color:var(--accent)}
+.daytype em{font-style:normal; opacity:.55; font-weight:500}
+
+/* ---------- posiłki ---------- */
+.meal{margin-top:12px; background:var(--surface); border-radius:var(--r-card); overflow:hidden; box-shadow:var(--shadow)}
+.meal-h{display:flex; align-items:center; gap:10px; padding:18px 22px 14px; cursor:pointer}
+.meal-h:active{background:var(--surface-2)}
+.meal-h h2{margin:0; font-family:var(--display); font-size:18px; font-weight:700; letter-spacing:-.03em;
+  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.meal-h .kc{font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums; font-weight:600}
+.meal-emoji{font-size:17px; line-height:1}
+.meal-h .pen{width:15px;height:15px;flex:none;fill:none;stroke:var(--ink-3);stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round;margin-left:2px}
+.items{list-style:none; margin:0; padding:0}
+.items li{border-top:1px solid var(--line)}
+.item{width:100%; display:flex; align-items:center; gap:12px; padding:13px 22px; text-align:left}
+.item:active{background:var(--surface-2)}
+.item .t{flex:1; min-width:0}
+.item .t b{display:block; font-size:15px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.item .t span{font-size:13px; color:var(--ink-3); display:block; margin-top:2px}
+.item .k{font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; flex:none; text-align:right}
+.item .k u{display:block; text-decoration:none; font-size:11px; color:var(--ink-3); font-weight:500; margin-top:2px}
+.addrow{width:100%; display:flex; align-items:center; gap:10px; padding:15px 22px; border-top:1px solid var(--line);
+  color:var(--ink); font-size:14px; font-weight:600}
+.addrow:active{background:var(--surface-2)}
+.addrow .plus{width:26px;height:26px;border-radius:99px;background:var(--accent);color:var(--on-accent);
+  display:grid;place-items:center;font-size:16px;line-height:1;font-weight:500;flex:none}
+.addmeal{width:100%;margin-top:14px;padding:16px;border-radius:var(--r-pill);
+  border:1.5px dashed var(--line-strong); color:var(--ink-2); font-size:14px; font-weight:600; background:transparent}
+.addmeal:active{background:var(--surface)}
+
+/* ---------- woda ---------- */
+.water{margin-top:12px; background:var(--surface); border-radius:var(--r-card); padding:18px 22px 20px; box-shadow:var(--shadow)}
+.water-h{display:flex; align-items:center; gap:8px; margin-bottom:14px}
+.water-h b{font-family:var(--display); font-size:18px; font-weight:700; flex:1; letter-spacing:-.03em}
+.water-h span{font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; font-weight:500}
+.glasses{display:flex; gap:7px; flex-wrap:wrap}
+.glass{width:28px; height:36px; border-radius:6px 6px 12px 12px; border:2px solid var(--c); background:transparent; position:relative; overflow:hidden}
+.glass.full{background:var(--c)}
+.glass.full::after{content:''; position:absolute; inset:0; background:linear-gradient(transparent 55%, rgba(255,255,255,.22))}
+
+/* ---------- szybkie dodawanie ---------- */
+.quick{margin-top:24px}
+.quick .label{margin-bottom:10px}
+.chips{display:flex; gap:8px; overflow-x:auto; padding:2px 0 6px; scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none; background:var(--surface); border-radius:var(--r-pill); padding:11px 16px;
+  font-size:13px; font-weight:500; white-space:nowrap; color:var(--ink); box-shadow:var(--shadow)}
+.chip b{font-weight:600}
+.chip small{color:var(--ink-3); font-size:12px; margin-left:6px; font-variant-numeric:tabular-nums}
+.chip:active{background:var(--surface-2)}
+
+/* ---------- pływająca nawigacja ---------- */
+.tabs{
+  position:fixed; left:14px; right:14px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:40;
+  display:flex; gap:2px; max-width:432px; margin:0 auto;
+  background:var(--surface); border-radius:var(--r-pill); padding:6px;
+  box-shadow:var(--shadow-hero);
+}
+.tab{flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:9px 2px 8px;
+  color:var(--ink-3); font-size:10px; font-weight:600; letter-spacing:-.005em; border-radius:var(--r-pill); min-width:0}
+.tab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{background:var(--ink); color:#fff}
+
+/* ---------- bloki ogólne ---------- */
+.sec{margin-top:26px}
+.sec > .label{margin-bottom:10px}
+.card{background:var(--surface); border-radius:var(--r-card); overflow:hidden; box-shadow:var(--shadow)}
+.row{display:flex; align-items:center; gap:12px; padding:15px 22px; border-top:1px solid var(--line); width:100%; text-align:left}
+.row:first-child{border-top:0}
+.row .t{flex:1; min-width:0}
+.row .t b{display:block; font-size:15px; font-weight:500}
+.row .t span{display:block; font-size:13px; color:var(--ink-3); margin-top:2px}
+.row .v{font-size:14px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--ink-2)}
+button.row:active{background:var(--surface-2)}
+
+.field{padding:13px 22px; border-top:1px solid var(--line); display:flex; align-items:center; gap:14px}
+.field:first-child{border-top:0}
+.field label{flex:1; font-size:15px}
+.field label small{display:block; color:var(--ink-3); font-size:13px; margin-top:1px}
+.field input, .field select{
+  width:112px; text-align:right; background:var(--surface-2); border:0;
+  border-radius:var(--r-input); padding:11px 16px; font-size:16px; font-variant-numeric:tabular-nums; flex:none;
+}
+.field select{width:auto; max-width:180px; text-align:left; -webkit-appearance:none; appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--ink-4) 50%),linear-gradient(135deg,var(--ink-4) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px; background-size:5px 5px,5px 5px; background-repeat:no-repeat;
+  padding-right:34px}
+
+.btn{display:block; width:100%; text-align:center; background:var(--ink); color:#fff;
+  border-radius:var(--r-pill); padding:17px; font-size:15px; font-weight:600; letter-spacing:-.015em}
+.btn:active{background:#2A272F}
+.btn.brand{background:var(--accent)}
+.btn.brand:active{background:var(--accent-2)}
+.btn.ghost{background:var(--surface); color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--line-strong)}
+.btn.ghost:active{background:var(--surface-2)}
+.btn.danger{background:transparent; color:var(--over); box-shadow:inset 0 0 0 1.5px var(--over)}
+.btn[disabled]{opacity:.4}
+.btn-row{display:flex; gap:10px; margin-top:14px}
+
+.note{font-size:13px; color:var(--ink-2); line-height:1.55; margin:12px 6px 0}
+.note b{color:var(--ink); font-weight:600}
+
+.mini{width:36px;height:36px;border-radius:var(--r-pill);background:var(--surface-2);
+  display:grid;place-items:center;color:var(--ink-2);flex:none}
+.mini svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.mini:active{background:var(--surface-3)}
+.mini[disabled]{opacity:.28}
+.mealrow{display:flex;align-items:center;gap:8px;padding:11px 12px 11px 22px;border-top:1px solid var(--line)}
+.mealrow:first-child{border-top:0}
+.mealrow .pick{display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;padding:4px 0}
+.mealrow .pick b{display:block;font-size:15px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mealrow .pick span{display:block;font-size:13px;color:var(--ink-3);margin-top:1px}
+.mealrow .emo{font-size:19px;line-height:1;flex:none;width:24px;text-align:center}
+
+/* ---------- wyszukiwarka i biblioteka ---------- */
+.searchbox{position:relative; margin-top:4px}
+.searchbox input{width:100%; background:var(--surface); border:0; border-radius:var(--r-input);
+  padding:16px 46px 16px 46px; font-size:16px; box-shadow:var(--shadow)}
+.searchbox input::placeholder{color:var(--ink-4)}
+.searchbox .ico{position:absolute; left:18px; top:50%; transform:translateY(-50%); width:17px; height:17px;
+  fill:none; stroke:var(--ink-4); stroke-width:2; stroke-linecap:round; pointer-events:none}
+.searchbox .clr{position:absolute; right:8px; top:50%; transform:translateY(-50%); width:34px; height:34px;
+  display:grid; place-items:center; color:var(--ink-4); font-size:20px; border-radius:99px}
+
+.filters{display:flex; gap:7px; overflow-x:auto; margin-top:12px; padding:2px 0 6px; scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fbtn{flex:none; padding:9px 16px; border-radius:var(--r-pill); background:var(--surface);
+  font-size:13px; font-weight:600; color:var(--ink-2); box-shadow:var(--shadow)}
+.fbtn.on{background:var(--ink); color:#fff}
+
+.plist{list-style:none; margin:12px 0 0; padding:0; background:var(--surface);
+  border-radius:var(--r-card); overflow:hidden; box-shadow:var(--shadow)}
+.plist:empty{display:none}
+.plist li{border-top:1px solid var(--line)}
+.plist li:first-child{border-top:0}
+.prod{width:100%; display:flex; align-items:center; gap:12px; padding:14px 22px; text-align:left}
+.prod:active{background:var(--surface-2)}
+.prod .t{flex:1; min-width:0}
+.prod .t b{display:block; font-size:15px; font-weight:500; line-height:1.35}
+.prod .t span{display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-3); margin-top:5px; flex-wrap:wrap}
+.prod .k{font-size:16px; font-weight:700; font-variant-numeric:tabular-nums; flex:none; font-family:var(--display);
+  letter-spacing:-.03em; text-align:right}
+.prod .k u{display:block; text-decoration:none; font-size:10.5px; color:var(--ink-3); font-weight:500; font-family:var(--ui);
+  letter-spacing:-.01em; margin-top:2px}
+.tag{padding:4px 10px; border-radius:var(--r-pill); font-size:10.5px; font-weight:600; letter-spacing:0; text-transform:none}
+.tag.lidl{background:var(--c-soft); color:var(--c-ink)}
+.tag.biedronka{background:var(--over-soft); color:#B22443}
+.tag.own{background:var(--accent-soft); color:var(--accent)}
+.tag.today{background:var(--f-soft); color:var(--f-ink); flex:none}
+.macro-mini{display:inline-flex; gap:8px; font-variant-numeric:tabular-nums}
+.macro-mini i{font-style:normal}
+.macro-mini .a{color:var(--p)} .macro-mini .b{color:var(--c-ink)} .macro-mini .c{color:var(--f-ink)}
+
+.empty{text-align:center; padding:44px 24px; color:var(--ink-2); font-size:14px; line-height:1.55}
+.empty b{display:block; color:var(--ink); font-size:18px; font-weight:700; margin-bottom:6px;
+  font-family:var(--display); letter-spacing:-.03em}
+
+/* ---------- arkusz ---------- */
+.scrim{position:fixed; inset:0; background:rgba(23,8,44,.34); z-index:50; opacity:0; pointer-events:none;
+  transition:opacity .24s; -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px)}
+.scrim.on{opacity:1; pointer-events:auto}
+.sheet{
+  position:fixed; left:0; right:0; bottom:0; z-index:60; max-width:460px; margin:0 auto;
+  background:var(--surface); border-radius:var(--r-card) var(--r-card) 0 0; box-shadow:var(--sheet-shadow);
+  transform:translateY(102%); transition:transform .3s cubic-bezier(.3,.8,.35,1);
+  max-height:92vh; display:flex; flex-direction:column; padding-bottom:env(safe-area-inset-bottom);
+}
+.sheet.on{transform:translateY(0)}
+.grip{width:40px; height:4px; border-radius:99px; background:var(--line-strong); margin:12px auto 0; flex:none}
+.sheet-h{display:flex; align-items:flex-start; gap:12px; padding:16px 22px 12px; flex:none}
+.sheet-h .t{flex:1; min-width:0}
+.sheet-h h3{margin:0; font-family:var(--display); font-size:24px; font-weight:700; letter-spacing:-.035em; line-height:1.15}
+.sheet-h p{margin:5px 0 0; font-size:13px; color:var(--ink-3)}
+.x{width:36px;height:36px;border-radius:99px;background:var(--surface-2);display:grid;place-items:center;
+  color:var(--ink-2);font-size:19px;flex:none}
+.sheet-b{overflow-y:auto; -webkit-overflow-scrolling:touch; padding:0 22px 24px}
+
+.amt{display:flex; gap:10px; margin-top:6px}
+.amt input{flex:1; background:var(--surface-2); border:0; border-radius:var(--r-input);
+  padding:18px; font-size:32px; font-family:var(--display); font-weight:700; text-align:center;
+  font-variant-numeric:tabular-nums; letter-spacing:-.04em; min-width:0}
+.amt select{background:var(--surface-2); border:0; border-radius:var(--r-input); padding:18px 38px 18px 18px;
+  font-size:15px; font-weight:600; -webkit-appearance:none; appearance:none; max-width:52%;
+  background-image:linear-gradient(45deg,transparent 50%,var(--ink-4) 50%),linear-gradient(135deg,var(--ink-4) 50%,transparent 50%);
+  background-position:calc(100% - 20px) 31px,calc(100% - 15px) 31px; background-size:5px 5px,5px 5px; background-repeat:no-repeat}
+.presets{display:flex; gap:7px; margin-top:12px; flex-wrap:wrap}
+.pre{padding:9px 15px; border-radius:var(--r-pill); background:var(--surface-2); font-size:13px; font-weight:600; color:var(--ink-2)}
+.pre:active{background:var(--surface-3)}
+
+.preview{display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:18px}
+.preview div{background:var(--surface-2); padding:14px 6px; text-align:center; border-radius:var(--r-nested)}
+.preview .n{font-family:var(--display); font-size:21px; font-weight:700; font-variant-numeric:tabular-nums;
+  letter-spacing:-.035em; display:block; color:var(--ink)}
+.preview .l{font-size:10.5px; color:var(--ink-3); font-weight:600; margin-top:3px; display:block}
+.preview .pp{background:var(--p-soft)} .preview .cc{background:var(--c-soft)} .preview .ff{background:var(--f-soft)}
+.preview .pp .n{color:var(--accent)} .preview .cc .n{color:var(--c-ink)} .preview .ff .n{color:var(--f-ink)}
+
+.mealpick{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:14px}
+.mp{padding:14px 10px; border-radius:var(--r-pill); background:var(--surface-2); font-size:13.5px; font-weight:600; color:var(--ink-2)}
+.mp.on{background:var(--accent-soft); color:var(--accent); box-shadow:inset 0 0 0 1.5px var(--accent)}
+
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px}
+.form-grid .wide{grid-column:1/-1}
+.inp{display:block}
+.inp span{display:block; font-size:11.5px; font-weight:600; color:var(--ink-3); margin:0 0 6px 4px; letter-spacing:0}
+.inp input, .inp select, .inp textarea{width:100%; background:var(--surface-2); border:0;
+  border-radius:var(--r-input); padding:14px 16px; font-size:16px}
+.inp textarea{min-height:100px; resize:vertical; font-size:13px; line-height:1.5;
+  font-family:ui-monospace,Menlo,monospace; border-radius:var(--r-nested)}
+
+.banner{background:var(--accent-soft); border-radius:var(--r-card); padding:18px 20px; margin-top:14px;
+  display:flex; gap:12px; align-items:flex-start}
+.banner .t{flex:1}
+.banner b{display:block; font-size:16px; font-family:var(--display); font-weight:700; margin-bottom:4px; letter-spacing:-.03em}
+.banner p{margin:0; font-size:13px; color:var(--ink-2); line-height:1.55}
+.banner button{color:var(--accent); font-weight:700; font-size:13px; margin-top:10px}
+
+.toast{position:fixed; left:50%; bottom:calc(104px + env(safe-area-inset-bottom)); transform:translate(-50%,14px);
+  background:var(--ink); color:#fff; padding:14px 22px; border-radius:var(--r-pill); font-size:14px; font-weight:600;
+  z-index:80; opacity:0; pointer-events:none; transition:.26s; max-width:88vw; text-align:center; box-shadow:var(--shadow-hero)}
+.toast.on{opacity:1; transform:translate(-50%,0)}
+
+/* ---------- przełącznik, segment, dni tygodnia ---------- */
+.sw{width:52px;height:31px;border-radius:99px;background:var(--surface-3);position:relative;flex:none;transition:background .2s}
+.sw i{position:absolute;top:3px;left:3px;width:25px;height:25px;border-radius:99px;background:#fff;
+  box-shadow:0 2px 6px rgba(25,23,28,.2);transition:transform .2s}
+.sw.on{background:var(--accent)}
+.sw.on i{transform:translateX(21px)}
+.seg{display:flex;gap:4px;background:var(--surface-2);border-radius:var(--r-pill);padding:5px;margin:12px 0}
+.seg button{flex:1;padding:11px 6px;border-radius:var(--r-pill);font-size:13px;font-weight:600;color:var(--ink-3)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.wdays{display:flex;gap:6px;padding:16px}
+.wdays button{flex:1;height:44px;border-radius:var(--r-pill);background:var(--surface-2);
+  font-size:12.5px;font-weight:700;color:var(--ink-3)}
+.wdays button.on{background:var(--accent);color:#fff}
+.emojis{display:flex;flex-wrap:wrap;gap:8px}
+.emojis button{width:46px;height:46px;border-radius:var(--r-pill);background:var(--surface-2);
+  font-size:21px;line-height:1;display:grid;place-items:center}
+.emojis button.on{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+
+/* ---------- kalendarz ---------- */
+.cal-h{display:flex;align-items:center;gap:8px;padding:16px 14px 8px}
+.cal-h b{flex:1;text-align:center;font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.03em}
+.cal-w,.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:0 14px}
+.cal-w{padding-bottom:6px}
+.cal-w span{text-align:center;font-size:10.5px;font-weight:700;color:var(--ink-3)}
+.cal-g{padding-bottom:16px}
+.cal-c{aspect-ratio:1;border-radius:var(--r-nested);background:var(--surface-2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:2px}
+.cal-c .dn{font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;color:var(--ink-2)}
+.cal-c .bar{width:58%;height:3px;border-radius:99px;background:var(--line-strong);overflow:hidden}
+.cal-c .bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.cal-c.over .bar i{background:var(--over)}
+.cal-c.train{background:var(--accent-soft)}
+.cal-c.train .dn{color:var(--accent);font-weight:700}
+.cal-c.now{box-shadow:inset 0 0 0 2px var(--ink)}
+.cal-c.now .dn{color:var(--ink)}
+.cal-c.future .dn{opacity:.38}
+.cal-c.blank{background:transparent;pointer-events:none}
+.cal-c.pick{cursor:pointer}
+.cal-c.pick:active{filter:brightness(.96)}
+.cal-hint{padding:0 22px 16px;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.cal-hint b{color:var(--ink);font-weight:600}
+.mstats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 14px 16px}
+.mstats div{background:var(--surface-2);padding:14px 6px;text-align:center;border-radius:var(--r-nested)}
+.mstats .n{display:block;font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;color:var(--ink)}
+.mstats .l{display:block;font-size:10px;color:var(--ink-3);font-weight:600;margin-top:3px;line-height:1.3}
+
+/* ---------- tydzień ---------- */
+.wk-nav{display:flex;align-items:center;gap:8px;padding:16px 14px 6px}
+.wk-nav .t{flex:1;text-align:center;line-height:1.2}
+.wk-nav b{display:block;font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.03em}
+.wk-nav span{display:block;font-size:11.5px;color:var(--ink-3);font-weight:500;margin-top:2px}
+.wk-chart{position:relative;height:132px;display:flex;align-items:flex-end;gap:6px;padding:0 16px}
+.wk-goal{position:absolute;left:16px;right:16px;border-top:1.5px dashed var(--line-strong);pointer-events:none}
+.wk-goal i{position:absolute;right:0;top:-15px;font-size:10px;font-style:normal;color:var(--ink-3);
+  background:var(--surface);padding:0 4px}
+.wk-bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%}
+.wk-bar .v{font-size:10px;color:var(--ink-3);font-variant-numeric:tabular-nums;line-height:1}
+.wk-bar .col{width:100%;max-width:28px;border-radius:var(--r-pill);background:var(--accent);min-height:4px}
+.wk-bar.over .col{background:var(--over)}
+.wk-bar.none .col{background:var(--surface-3)}
+.wk-bar.fut .col{background:repeating-linear-gradient(45deg,var(--surface-3),var(--surface-3) 3px,transparent 3px,transparent 6px)}
+.wk-days{display:flex;gap:6px;padding:9px 16px 14px}
+.wk-days span{flex:1;text-align:center;font-size:10.5px;font-weight:700;color:var(--ink-3)}
+.wk-days span.tr{color:var(--accent)}
+.wk-days span.now{text-decoration:underline;text-underline-offset:3px}
+.wk-days span.now:not(.tr){color:var(--ink)}
+.wk-foot{padding:16px 22px 20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2);line-height:1.55}
+.wk-foot b{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
+.wk-foot .sub{display:block;color:var(--ink-3);font-size:12px;margin-top:6px}
+
+/* ---------- atlas ---------- */
+.exrow{display:flex;align-items:center;gap:10px;padding:13px 14px 13px 22px;border-top:1px solid var(--line)}
+.exrow:first-child{border-top:0}
+.exrow .pick{flex:1;min-width:0;text-align:left;padding:3px 0}
+.exrow .pick b{display:block;font-size:15px;font-weight:500;line-height:1.35}
+.ex-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.tag.grp{background:var(--accent-soft);color:var(--accent)}
+.tag.eq{background:var(--surface-2);color:var(--ink-2)}
+.tag.l1{background:var(--c-soft);color:var(--c-ink)}
+.tag.l2{background:var(--f-soft);color:var(--f-ink)}
+.tag.l3{background:var(--over-soft);color:#B22443}
+.fav{width:38px;height:38px;border-radius:99px;display:grid;place-items:center;flex:none;font-size:16px;
+  background:var(--surface-2);color:var(--ink-3)}
+.fav.on{background:var(--f-soft);color:var(--f-ink)}
+.ex-h{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:-.01em;text-transform:uppercase;
+  color:var(--ink-3);margin:22px 0 11px}
+.ex-steps{margin:0;padding:0;list-style:none;counter-reset:s}
+.ex-steps li{counter-increment:s;position:relative;padding-left:36px;margin-bottom:13px;font-size:14.5px;line-height:1.5}
+.ex-steps li::before{content:counter(s);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:99px;
+  background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center}
+.ex-err{margin:0;padding:0;list-style:none}
+.ex-err li{position:relative;padding-left:28px;margin-bottom:11px;font-size:14.5px;line-height:1.5;color:var(--ink-2)}
+.ex-err li::before{content:'×';position:absolute;left:7px;top:-3px;color:var(--over);font-weight:700;font-size:18px}
+.ex-tip{margin-top:20px;background:var(--accent-soft);border-radius:var(--r-card);padding:16px 20px;font-size:14px;line-height:1.55}
+.ex-tip b{display:block;font-size:11px;letter-spacing:0;text-transform:uppercase;color:var(--accent);
+  margin-bottom:5px;font-weight:700}
+
+.datebar h1.tappable{cursor:pointer;border-radius:var(--r-pill)}
+.datebar h1.tappable:active{background:var(--surface-2)}
+
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important; animation-duration:.01ms !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top" id="top">
+    <div class="datebar">
+      <button class="navbtn" id="prevDay" aria-label="Poprzedni dzień"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h1 id="dayTitle" class="tappable" role="button" tabindex="0" aria-label="Wybierz dzień z kalendarza">Dziś<small id="daySub">—</small></h1>
+      <button class="navbtn" id="nextDay" aria-label="Następny dzień"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+  </header>
+
+  <main id="v-log" class="on">
+    <section class="sum" id="sum"></section>
+    <div id="meals"></div>
+    <section class="water" id="water"></section>
+    <section class="quick">
+      <span class="label" id="quickLabel">Szybkie dodawanie</span>
+      <div class="chips" id="quickChips"></div>
+    </section>
+    <div id="tip"></div>
+  </main>
+
+  <main id="v-lib">
+    <div class="searchbox">
+      <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="libSearch" type="search" placeholder="Szukaj produktu…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="clr" id="libClear" aria-label="Wyczyść" hidden>×</button>
+    </div>
+    <div class="filters" id="libFilters"></div>
+    <ul class="plist" id="libList"></ul>
+    <div id="libEmpty"></div>
+    <div class="sec">
+      <button class="btn ghost" id="newProduct">+ Dodaj własny produkt</button>
+      <p class="note"><b>Wartości są przybliżone</b> — producenci zmieniają receptury. Jeśli coś się nie zgadza z etykietą, dotknij produktu i popraw albo dodaj swój.</p>
+    </div>
+  </main>
+
+  <main id="v-plan"></main>
+
+  <main id="v-atlas">
+    <div class="searchbox">
+      <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="exSearch" type="search" placeholder="Szukaj ćwiczenia…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="clr" id="exClear" aria-label="Wyczyść" hidden>×</button>
+    </div>
+    <div class="filters" id="exFilters"></div>
+    <div class="card" id="exList"></div>
+    <div id="exEmpty"></div>
+    <p class="note">Opisy pokazują technikę, nie plan treningowy. Przy ćwiczeniach ze sztangą — przysiad, martwy ciąg, wyciskanie — warto pierwszy raz przećwiczyć ruch z kimś doświadczonym i zacząć od samego gryfu.</p>
+  </main>
+
+  <main id="v-me"></main>
+
+  <nav class="tabs">
+    <button class="tab on" data-view="log"><svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 015.5 4H18a2 2 0 012 2v13a1 1 0 01-1 1H6a2 2 0 01-2-2z"/><path d="M8 9h8M8 13h5"/></svg>Dziennik</button>
+    <button class="tab" data-view="lib"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>Produkty</button>
+    <button class="tab" data-view="plan"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3.2v3.6M16 3.2v3.6M3.5 10h17"/></svg>Plan</button>
+    <button class="tab" data-view="atlas"><svg viewBox="0 0 24 24"><path d="M6.5 8.5v7M3.5 10.5v3M17.5 8.5v7M20.5 10.5v3M6.5 12h11"/></svg>Atlas</button>
+    <button class="tab" data-view="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.7"/><path d="M4.8 20a7.4 7.4 0 0114.4 0"/></svg>Ja</button>
+  </nav>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="grip"></div>
+  <div class="sheet-h"><div class="t"><h3 id="sheetTitle"></h3><p id="sheetSub"></p></div><button class="x" id="sheetX" aria-label="Zamknij">×</button></div>
+  <div class="sheet-b" id="sheetBody"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   MIARKA — licznik kalorii i makro
+   Dane: localStorage (prywatne, na urządzeniu).
+   Wartości odżywcze na 100 g / 100 ml, przybliżone.
+   [nazwa, marka, sklep, kcal, B, W, T, błonnik, kategoria, jednostki]
+   ============================================================ */
+const L='lidl', B='biedronka';
+const SEED = [
+/* ---- NABIAŁ I JAJA ---- */
+['Jajko kurze (całe)','','',143,12.6,0.7,9.5,0,'nab',[['szt. M (53 g)',53],['szt. L (63 g)',63]]],
+['Białko jaja','','',52,10.9,0.7,0.2,0,'nab',[['z 1 jajka (33 g)',33]]],
+['Mleko 2%','','',51,3.3,4.8,2.0,0,'nab',[['szklanka (250 ml)',250]]],
+['Mleko 3,2%','','',61,3.2,4.7,3.2,0,'nab',[['szklanka (250 ml)',250]]],
+['Mleko 1,5%','','',46,3.3,4.8,1.5,0,'nab',[['szklanka (250 ml)',250]]],
+['Napój migdałowy niesłodzony','','',13,0.5,0.1,1.1,0.4,'nab',[['szklanka (250 ml)',250]]],
+['Napój owsiany','','',45,0.6,6.6,1.5,0.8,'nab',[['szklanka (250 ml)',250]]],
+['Jogurt naturalny 2%','','',60,4.3,6.0,2.0,0,'nab',[['kubek (150 g)',150],['duży (400 g)',400]]],
+['Jogurt grecki 10%','','',130,4.0,4.0,10.0,0,'nab',[['kubek (150 g)',150]]],
+['Jogurt typu greckiego 2%','','',75,8.0,4.5,2.0,0,'nab',[['kubek (150 g)',150]]],
+['Skyr naturalny','','',63,11.0,4.0,0.2,0,'nab',[['kubek (150 g)',150],['duży (450 g)',450]]],
+['Kefir 2%','','',51,3.4,4.7,2.0,0,'nab',[['szklanka (250 ml)',250]]],
+['Maślanka naturalna','','',40,3.4,4.7,1.0,0,'nab',[['szklanka (250 ml)',250]]],
+['Serek wiejski','','',98,12.0,3.0,4.3,0,'nab',[['opak. (200 g)',200]]],
+['Twaróg chudy','','',99,19.8,3.5,0.5,0,'nab',[['kostka (250 g)',250]]],
+['Twaróg półtłusty','','',133,18.0,3.5,5.0,0,'nab',[['kostka (250 g)',250]]],
+['Twaróg tłusty','','',175,16.0,3.4,11.0,0,'nab',[['kostka (250 g)',250]]],
+['Serek homogenizowany waniliowy','','',148,7.5,16.0,6.0,0,'nab',[['opak. (150 g)',150]]],
+['Ser żółty gouda','','',356,25.0,0.5,28.0,0,'nab',[['plaster (20 g)',20]]],
+['Ser żółty edamski','','',330,26.0,0.5,25.0,0,'nab',[['plaster (20 g)',20]]],
+['Mozzarella','','',253,18.0,1.0,20.0,0,'nab',[['kulka (125 g)',125]]],
+['Mozzarella light','','',163,19.0,1.5,9.0,0,'nab',[['kulka (125 g)',125]]],
+['Feta','','',264,14.0,1.0,22.0,0,'nab',[['kostka (150 g)',150]]],
+['Ser pleśniowy camembert','','',300,20.0,0.5,24.0,0,'nab',[['opak. (120 g)',120]]],
+['Parmezan','','',402,33.0,0.9,29.0,0,'nab',[['łyżka tarty (6 g)',6]]],
+['Serek kanapkowy śmietankowy','','',250,6.0,3.5,24.0,0,'nab',[['łyżka (20 g)',20]]],
+['Serek kanapkowy light','','',150,9.0,4.5,10.0,0,'nab',[['łyżka (20 g)',20]]],
+['Śmietana 18%','','',184,2.8,3.6,18.0,0,'nab',[['łyżka (15 g)',15]]],
+['Śmietana 30%','','',292,2.4,3.3,30.0,0,'nab',[['łyżka (15 g)',15]]],
+['Masło 82%','','',735,0.7,0.7,82.0,0,'nab',[['łyżeczka (5 g)',5],['do kanapki (8 g)',8]]],
+/* ---- Lidl / Biedronka: nabiał ---- */
+['Skyr naturalny','Pilos',L,62,11.0,4.0,0.2,0,'nab',[['kubek (150 g)',150],['duży (450 g)',450]]],
+['Jogurt typu greckiego 2%','Pilos',L,77,8.5,4.5,2.0,0,'nab',[['kubek (150 g)',150]]],
+['Jogurt naturalny','Pilos',L,58,4.2,5.7,2.0,0,'nab',[['kubek (180 g)',180]]],
+['Serek wiejski','Pilos',L,98,12.3,3.2,4.1,0,'nab',[['opak. (200 g)',200]]],
+['Twaróg półtłusty','Pilos',L,134,18.0,3.6,5.2,0,'nab',[['kostka (250 g)',250]]],
+['Mleko 2%','Pilos',L,50,3.2,4.7,2.0,0,'nab',[['szklanka (250 ml)',250]]],
+['Ser Gouda w plastrach','Pilos',L,356,25.0,0.1,28.0,0,'nab',[['plaster (20 g)',20]]],
+['Masło ekstra 82%','Pilos',L,744,0.6,0.6,82.0,0,'nab',[['do kanapki (8 g)',8]]],
+['Skyr naturalny','Mleczna Dolina',B,62,11.0,4.0,0.2,0,'nab',[['kubek (150 g)',150]]],
+['Jogurt naturalny','Mleczna Dolina',B,59,4.4,5.8,2.0,0,'nab',[['kubek (180 g)',180]]],
+['Jogurt grecki','Mleczna Dolina',B,128,3.9,4.2,10.5,0,'nab',[['kubek (150 g)',150]]],
+['Serek wiejski','Mleczna Dolina',B,99,12.0,3.3,4.2,0,'nab',[['opak. (200 g)',200]]],
+['Twaróg półtłusty','Mleczna Dolina',B,133,18.0,3.5,5.0,0,'nab',[['kostka (250 g)',250]]],
+['Mleko 2%','Mleczna Dolina',B,50,3.2,4.7,2.0,0,'nab',[['szklanka (250 ml)',250]]],
+['Ser Gouda w plastrach','Mleczna Dolina',B,356,25.0,0.1,28.0,0,'nab',[['plaster (20 g)',20]]],
+['Masło ekstra 82%','Mleczna Dolina',B,744,0.6,0.6,82.0,0,'nab',[['do kanapki (8 g)',8]]],
+['Jogurt proteinowy naturalny','Go Active',B,65,9.0,5.0,0.5,0,'nab',[['kubek (150 g)',150]]],
+
+/* ---- MIĘSO I RYBY ---- */
+['Pierś z kurczaka (surowa)','','',110,23.0,0,1.5,0,'mie',[['filet (150 g)',150]]],
+['Pierś z kurczaka (grillowana)','','',165,31.0,0,3.6,0,'mie',[['porcja (130 g)',130]]],
+['Udko z kurczaka bez skóry','','',120,19.0,0,4.5,0,'mie',[['udko (100 g)',100]]],
+['Pierś z indyka (surowa)','','',104,22.0,0,1.5,0,'mie',[['filet (150 g)',150]]],
+['Schab wieprzowy','','',130,21.0,0,5.0,0,'mie',[['kotlet (120 g)',120]]],
+['Karkówka wieprzowa','','',240,17.0,0,19.0,0,'mie',[['porcja (150 g)',150]]],
+['Boczek surowy','','',400,12.0,0,39.0,0,'mie',[['plaster (25 g)',25]]],
+['Mięso mielone wołowe 5%','','',137,21.0,0,5.0,0,'mie',[['porcja (150 g)',150]]],
+['Mięso mielone wieprzowo-wołowe','','',230,17.0,0,18.0,0,'mie',[['porcja (150 g)',150]]],
+['Wołowina — ligawa','','',130,21.0,0,5.0,0,'mie',[['stek (180 g)',180]]],
+['Szynka gotowana','','',110,18.0,1.5,3.5,0,'mie',[['plaster (20 g)',20]]],
+['Polędwica sopocka','','',110,21.0,1.0,2.5,0,'mie',[['plaster (15 g)',15]]],
+['Kiełbasa śląska','','',290,14.0,1.0,25.0,0,'mie',[['sztuka (100 g)',100]]],
+['Parówki drobiowe','','',217,12.0,2.0,18.0,0,'mie',[['parówka (40 g)',40]]],
+['Kabanosy','','',450,28.0,1.0,37.0,0,'mie',[['sztuka (35 g)',35]]],
+['Łosoś świeży','','',200,20.0,0,13.0,0,'mie',[['porcja (140 g)',140]]],
+['Łosoś wędzony','','',180,22.0,0,10.0,0,'mie',[['plaster (25 g)',25]]],
+['Dorsz','','',78,17.7,0,0.7,0,'mie',[['porcja (150 g)',150]]],
+['Mintaj','','',73,17.0,0,0.5,0,'mie',[['porcja (150 g)',150]]],
+['Tuńczyk w sosie własnym','','',108,24.0,0.5,1.0,0,'mie',[['puszka odsącz. (120 g)',120]]],
+['Tuńczyk w oleju (odsączony)','','',190,25.0,0,10.0,0,'mie',[['puszka odsącz. (120 g)',120]]],
+['Makrela wędzona','','',305,20.0,0,25.0,0,'mie',[['porcja (100 g)',100]]],
+['Śledź w oleju','','',230,16.0,0,18.0,0,'mie',[['porcja (80 g)',80]]],
+['Krewetki','','',85,18.0,1.0,1.0,0,'mie',[['porcja (100 g)',100]]],
+['Tofu naturalne','','',145,15.0,2.0,8.0,1.0,'mie',[['kostka (180 g)',180]]],
+['Szynka z piersi kurczaka','Pikok',L,105,20.0,1.5,2.0,0,'mie',[['plaster (20 g)',20]]],
+['Filet z kurczaka wędzony','Pikok',L,110,21.0,1.0,2.0,0,'mie',[['plaster (20 g)',20]]],
+['Parówki drobiowe','Dulano',L,217,12.0,2.0,18.0,0,'mie',[['parówka (40 g)',40]]],
+['Szynka z kurczaka','Kraina Wędlin',B,110,19.0,2.0,3.0,0,'mie',[['plaster (20 g)',20]]],
+['Polędwica sopocka','Kraina Wędlin',B,110,21.0,1.0,2.5,0,'mie',[['plaster (15 g)',15]]],
+['Tuńczyk w sosie własnym','Nixe',L,108,24.0,0.5,1.0,0,'mie',[['puszka odsącz. (120 g)',120]]],
+
+/* ---- ZBOŻA I PIECZYWO ---- */
+['Chleb pszenny','','',265,8.0,49.0,3.0,2.5,'zbo',[['kromka (35 g)',35]]],
+['Chleb żytni razowy','','',220,6.5,41.0,1.5,7.0,'zbo',[['kromka (40 g)',40]]],
+['Chleb graham','','',247,8.5,45.0,2.0,5.0,'zbo',[['kromka (35 g)',35]]],
+['Chleb tostowy','','',270,8.5,48.0,4.0,2.5,'zbo',[['kromka (25 g)',25]]],
+['Bułka kajzerka','','',290,9.0,57.0,2.5,2.5,'zbo',[['sztuka (50 g)',50]]],
+['Bułka grahamka','','',270,9.0,50.0,2.5,4.5,'zbo',[['sztuka (60 g)',60]]],
+['Bagietka','','',274,9.0,55.0,1.5,2.7,'zbo',[['kawałek (60 g)',60]]],
+['Tortilla pszenna','','',310,8.0,50.0,8.0,2.5,'zbo',[['sztuka (60 g)',60]]],
+['Wafle ryżowe','','',380,8.0,81.0,3.0,2.0,'zbo',[['sztuka (8 g)',8]]],
+['Pieczywo chrupkie żytnie','','',330,10.0,60.0,2.0,15.0,'zbo',[['kromka (10 g)',10]]],
+['Płatki owsiane','','',372,13.0,59.0,7.0,10.0,'zbo',[['porcja (50 g)',50],['szklanka (90 g)',90]]],
+['Otręby owsiane','','',375,17.0,50.0,7.0,15.0,'zbo',[['łyżka (10 g)',10]]],
+['Musli z bakaliami','','',380,9.0,60.0,10.0,7.0,'zbo',[['porcja (50 g)',50]]],
+['Płatki kukurydziane','','',378,7.0,84.0,0.9,3.0,'zbo',[['porcja (30 g)',30]]],
+['Granola','','',450,9.0,60.0,18.0,7.0,'zbo',[['porcja (45 g)',45]]],
+['Ryż biały (suchy)','','',350,7.0,78.0,0.8,1.4,'zbo',[['porcja (60 g)',60],['woreczek (100 g)',100]]],
+['Ryż biały (ugotowany)','','',123,2.5,27.0,0.3,0.5,'zbo',[['porcja (150 g)',150]]],
+['Ryż brązowy (suchy)','','',350,7.5,72.0,2.8,3.5,'zbo',[['porcja (60 g)',60]]],
+['Kasza gryczana (sucha)','','',336,13.0,62.0,3.0,6.0,'zbo',[['porcja (60 g)',60]]],
+['Kasza jaglana (sucha)','','',346,10.0,71.0,3.0,3.5,'zbo',[['porcja (60 g)',60]]],
+['Kasza bulgur (sucha)','','',342,12.0,63.0,1.5,8.0,'zbo',[['porcja (60 g)',60]]],
+['Komosa ryżowa (sucha)','','',368,14.0,57.0,6.0,7.0,'zbo',[['porcja (60 g)',60]]],
+['Makaron pszenny (suchy)','','',352,12.0,71.0,1.5,3.0,'zbo',[['porcja (80 g)',80]]],
+['Makaron pełnoziarnisty (suchy)','','',340,13.0,62.0,2.5,8.0,'zbo',[['porcja (80 g)',80]]],
+['Makaron (ugotowany)','','',131,5.0,25.0,0.6,1.5,'zbo',[['porcja (200 g)',200]]],
+['Ziemniaki gotowane','','',77,2.0,17.0,0.1,1.8,'zbo',[['średni (120 g)',120]]],
+['Bataty pieczone','','',90,1.6,21.0,0.1,3.0,'zbo',[['sztuka (150 g)',150]]],
+['Mąka pszenna','','',345,10.0,71.0,1.0,2.5,'zbo',[['łyżka (12 g)',12],['szklanka (130 g)',130]]],
+['Płatki owsiane górskie','Crownfield',L,372,13.0,59.0,7.0,10.0,'zbo',[['porcja (50 g)',50]]],
+['Musli owocowe','Crownfield',L,380,9.0,60.0,10.0,7.0,'zbo',[['porcja (50 g)',50]]],
+['Płatki kukurydziane','Crownfield',L,378,7.0,84.0,0.9,3.0,'zbo',[['porcja (30 g)',30]]],
+['Makaron penne (suchy)','Combino',L,352,12.0,71.0,1.5,3.0,'zbo',[['porcja (80 g)',80]]],
+['Spaghetti (suche)','Combino',L,352,12.5,71.0,1.5,3.0,'zbo',[['porcja (80 g)',80]]],
+['Mąka pszenna typ 500','Belbake',L,345,10.0,71.0,1.0,2.5,'zbo',[['łyżka (12 g)',12]]],
+['Płatki owsiane','Vitanella',B,372,13.0,59.0,7.0,10.0,'zbo',[['porcja (50 g)',50]]],
+['Otręby owsiane','Vitanella',B,375,17.0,50.0,7.0,15.0,'zbo',[['łyżka (10 g)',10]]],
+['Kasza gryczana','Vitanella',B,336,13.0,62.0,3.0,6.0,'zbo',[['porcja (60 g)',60]]],
+
+/* ---- WARZYWA ---- */
+['Pomidor','','',18,0.9,3.9,0.2,1.2,'war',[['sztuka (120 g)',120]]],
+['Pomidorki koktajlowe','','',20,0.9,4.0,0.2,1.2,'war',[['garść (80 g)',80]]],
+['Ogórek świeży','','',15,0.7,3.6,0.1,0.5,'war',[['sztuka (120 g)',120]]],
+['Ogórek kiszony','','',12,0.6,2.2,0.1,0.8,'war',[['sztuka (60 g)',60]]],
+['Papryka czerwona','','',31,1.0,6.0,0.3,2.1,'war',[['sztuka (150 g)',150]]],
+['Sałata lodowa','','',15,1.4,2.9,0.2,1.2,'war',[['garść (30 g)',30]]],
+['Rukola','','',25,2.6,2.0,0.7,1.6,'war',[['garść (25 g)',25]]],
+['Szpinak świeży','','',23,2.9,3.6,0.4,2.2,'war',[['garść (40 g)',40]]],
+['Brokuł','','',34,2.8,7.0,0.4,2.6,'war',[['porcja (150 g)',150]]],
+['Kalafior','','',25,1.9,5.0,0.3,2.0,'war',[['porcja (150 g)',150]]],
+['Marchew','','',41,0.9,10.0,0.2,2.8,'war',[['sztuka (80 g)',80]]],
+['Cebula','','',40,1.1,9.0,0.1,1.7,'war',[['sztuka (100 g)',100]]],
+['Czosnek','','',149,6.4,33.0,0.5,2.1,'war',[['ząbek (3 g)',3]]],
+['Cukinia','','',17,1.2,3.1,0.3,1.0,'war',[['sztuka (200 g)',200]]],
+['Bakłażan','','',25,1.0,6.0,0.2,3.0,'war',[['sztuka (250 g)',250]]],
+['Pieczarki','','',22,3.0,3.3,0.3,1.0,'war',[['porcja (100 g)',100]]],
+['Kapusta kiszona','','',19,1.3,3.0,0.1,2.2,'war',[['porcja (100 g)',100]]],
+['Buraki gotowane','','',43,1.6,10.0,0.2,2.8,'war',[['porcja (100 g)',100]]],
+['Awokado','','',160,2.0,9.0,15.0,7.0,'war',[['połówka (75 g)',75],['sztuka (150 g)',150]]],
+['Kukurydza konserwowa','','',86,3.0,19.0,1.2,2.8,'war',[['puszka (140 g)',140]]],
+['Fasola czerwona konserwowa','','',91,6.0,12.0,0.5,6.0,'war',[['puszka (240 g)',240]]],
+['Ciecierzyca konserwowa','','',120,7.0,16.0,2.0,6.0,'war',[['puszka (240 g)',240]]],
+['Soczewica czerwona (sucha)','','',352,24.0,52.0,1.5,11.0,'war',[['porcja (60 g)',60]]],
+['Groszek zielony mrożony','','',73,5.0,10.0,0.4,5.0,'war',[['porcja (100 g)',100]]],
+['Mieszanka warzyw mrożona','','',45,2.5,7.0,0.4,3.0,'war',[['porcja (150 g)',150]]],
+
+/* ---- OWOCE ---- */
+['Banan','','',89,1.1,23.0,0.3,2.6,'owo',[['sztuka (120 g)',120]]],
+['Jabłko','','',52,0.3,14.0,0.2,2.4,'owo',[['sztuka (180 g)',180]]],
+['Gruszka','','',57,0.4,15.0,0.1,3.1,'owo',[['sztuka (170 g)',170]]],
+['Pomarańcza','','',47,0.9,12.0,0.1,2.4,'owo',[['sztuka (200 g)',200]]],
+['Mandarynka','','',53,0.8,13.0,0.3,1.8,'owo',[['sztuka (80 g)',80]]],
+['Truskawki','','',32,0.7,7.7,0.3,2.0,'owo',[['garść (100 g)',100]]],
+['Maliny','','',52,1.2,12.0,0.7,6.5,'owo',[['garść (100 g)',100]]],
+['Borówki amerykańskie','','',57,0.7,14.0,0.3,2.4,'owo',[['garść (100 g)',100]]],
+['Winogrona','','',69,0.7,18.0,0.2,0.9,'owo',[['garść (100 g)',100]]],
+['Arbuz','','',30,0.6,8.0,0.2,0.4,'owo',[['plaster (200 g)',200]]],
+['Kiwi','','',61,1.1,15.0,0.5,3.0,'owo',[['sztuka (75 g)',75]]],
+['Ananas','','',50,0.5,13.0,0.1,1.4,'owo',[['plaster (80 g)',80]]],
+['Brzoskwinia','','',39,0.9,10.0,0.3,1.5,'owo',[['sztuka (150 g)',150]]],
+['Śliwki','','',46,0.7,11.0,0.3,1.4,'owo',[['sztuka (60 g)',60]]],
+['Wiśnie','','',50,1.0,12.0,0.3,1.6,'owo',[['garść (100 g)',100]]],
+['Mango','','',60,0.8,15.0,0.4,1.6,'owo',[['sztuka (200 g)',200]]],
+['Daktyle suszone','','',282,2.5,75.0,0.4,8.0,'owo',[['sztuka (8 g)',8]]],
+['Rodzynki','','',299,3.0,79.0,0.5,3.7,'owo',[['łyżka (15 g)',15]]],
+['Morele suszone','','',241,3.4,63.0,0.5,7.3,'owo',[['sztuka (8 g)',8]]],
+
+/* ---- ORZECHY I NASIONA ---- */
+['Migdały','','',611,21.0,5.0,53.0,12.0,'orz',[['garść (25 g)',25]]],
+['Orzechy włoskie','','',690,15.0,7.0,65.0,6.7,'orz',[['garść (25 g)',25]]],
+['Orzechy nerkowca','','',580,18.0,27.0,44.0,3.3,'orz',[['garść (25 g)',25]]],
+['Orzechy laskowe','','',640,15.0,7.0,61.0,10.0,'orz',[['garść (25 g)',25]]],
+['Orzeszki ziemne','','',567,26.0,16.0,49.0,8.5,'orz',[['garść (25 g)',25]]],
+['Pistacje','','',580,20.0,28.0,45.0,10.0,'orz',[['garść (25 g)',25]]],
+['Pestki dyni','','',559,30.0,11.0,49.0,6.0,'orz',[['łyżka (10 g)',10]]],
+['Słonecznik łuskany','','',584,21.0,20.0,51.0,8.6,'orz',[['łyżka (10 g)',10]]],
+['Siemię lniane','','',534,18.0,29.0,42.0,27.0,'orz',[['łyżka (10 g)',10]]],
+['Nasiona chia','','',486,17.0,42.0,31.0,34.0,'orz',[['łyżka (12 g)',12]]],
+['Wiórki kokosowe','','',660,7.0,7.0,65.0,16.0,'orz',[['łyżka (7 g)',7]]],
+['Migdały','Alesto',L,611,22.0,4.5,53.0,12.0,'orz',[['garść (25 g)',25]]],
+['Orzechy włoskie','Alesto',L,690,15.0,7.0,65.0,6.7,'orz',[['garść (25 g)',25]]],
+['Orzechy nerkowca','Alesto',L,580,18.0,27.0,44.0,3.3,'orz',[['garść (25 g)',25]]],
+['Mieszanka studencka','Alesto',L,460,12.0,45.0,26.0,6.0,'orz',[['garść (30 g)',30]]],
+['Migdały','Vitanella',B,611,21.0,5.0,53.0,12.0,'orz',[['garść (25 g)',25]]],
+
+/* ---- TŁUSZCZE I SOSY ---- */
+['Oliwa z oliwek','','',900,0,0,100.0,0,'tlu',[['łyżka (10 g)',10],['łyżeczka (5 g)',5]]],
+['Olej rzepakowy','','',900,0,0,100.0,0,'tlu',[['łyżka (10 g)',10]]],
+['Masło orzechowe (100% orzechów)','','',600,25.0,12.0,50.0,6.0,'tlu',[['łyżka (16 g)',16]]],
+['Majonez','','',680,1.0,2.0,75.0,0,'tlu',[['łyżka (15 g)',15]]],
+['Majonez light','','',330,1.0,7.0,32.0,0,'tlu',[['łyżka (15 g)',15]]],
+['Ketchup','','',100,1.2,22.0,0.2,1.0,'tlu',[['łyżka (15 g)',15]]],
+['Musztarda','','',95,5.0,6.0,5.0,0,'tlu',[['łyżeczka (8 g)',8]]],
+['Sos sojowy','','',60,6.0,6.0,0.1,0,'tlu',[['łyżka (15 g)',15]]],
+['Hummus','','',240,7.0,14.0,17.0,5.0,'tlu',[['łyżka (25 g)',25]]],
+['Passata pomidorowa','','',34,1.4,5.5,0.3,1.5,'tlu',[['porcja (150 g)',150]]],
+['Sos pomidorowy do makaronu','','',60,1.5,8.0,2.0,1.5,'tlu',[['porcja (125 g)',125]]],
+['Passata pomidorowa','Baresa',L,34,1.4,5.5,0.3,1.5,'tlu',[['porcja (150 g)',150]]],
+
+/* ---- SŁODYCZE I PRZEKĄSKI ---- */
+['Czekolada mleczna','','',545,6.5,57.0,31.0,2.0,'slo',[['kostka (8 g)',8],['tabliczka (100 g)',100]]],
+['Czekolada gorzka 70%','','',570,8.0,33.0,42.0,10.0,'slo',[['kostka (8 g)',8]]],
+['Krem czekoladowo-orzechowy','','',539,6.0,57.0,31.0,0,'slo',[['łyżka (20 g)',20]]],
+['Miód','','',320,0.3,80.0,0,0,'slo',[['łyżeczka (9 g)',9]]],
+['Dżem truskawkowy','','',210,0.4,52.0,0.1,1.0,'slo',[['łyżka (20 g)',20]]],
+['Cukier biały','','',400,0,100.0,0,0,'slo',[['łyżeczka (5 g)',5]]],
+['Chipsy ziemniaczane','','',535,6.0,50.0,34.0,4.0,'slo',[['paczka (130 g)',130],['garść (30 g)',30]]],
+['Paluszki słone','','',400,11.0,70.0,8.0,3.0,'slo',[['garść (30 g)',30]]],
+['Popcorn solony','','',480,8.0,55.0,25.0,10.0,'slo',[['miska (40 g)',40]]],
+['Lody waniliowe','','',200,3.5,24.0,10.0,0,'slo',[['gałka (60 g)',60]]],
+['Ciastka owsiane','','',450,7.0,63.0,18.0,5.0,'slo',[['sztuka (15 g)',15]]],
+['Baton czekoladowy (typu Snickers)','','',484,8.0,60.0,23.0,1.5,'slo',[['sztuka (50 g)',50]]],
+['Wafelek (typu Prince Polo)','','',530,6.0,60.0,29.0,2.0,'slo',[['sztuka (35 g)',35]]],
+['Żelki','','',340,6.0,77.0,0.2,0,'slo',[['garść (30 g)',30]]],
+['Sernik','','',320,7.0,30.0,19.0,0.5,'slo',[['kawałek (120 g)',120]]],
+['Drożdżówka z serem','','',310,7.0,45.0,11.0,1.5,'slo',[['sztuka (90 g)',90]]],
+['Pączek','','',380,6.0,45.0,19.0,1.5,'slo',[['sztuka (80 g)',80]]],
+['Czekolada mleczna','Mister Choc',L,545,6.5,57.0,31.0,2.0,'slo',[['kostka (8 g)',8]]],
+['Baton daktylowy','Dobra Kaloria',B,400,7.0,50.0,17.0,7.0,'slo',[['sztuka (35 g)',35]]],
+
+/* ---- NAPOJE ---- */
+['Woda','','',0,0,0,0,0,'nap',[['szklanka (250 ml)',250],['butelka (500 ml)',500]]],
+['Kawa czarna (bez dodatków)','','',2,0.2,0,0,0,'nap',[['filiżanka (200 ml)',200]]],
+['Espresso','','',3,0.3,0,0,0,'nap',[['porcja (30 ml)',30]]],
+['Herbata (bez cukru)','','',1,0,0.2,0,0,'nap',[['kubek (250 ml)',250]]],
+['Coca-Cola','','',42,0,10.6,0,0,'nap',[['puszka (330 ml)',330],['butelka (500 ml)',500]]],
+['Cola zero','','',0.3,0,0,0,0,'nap',[['puszka (330 ml)',330]]],
+['Sok pomarańczowy','','',45,0.7,10.0,0.1,0.2,'nap',[['szklanka (250 ml)',250]]],
+['Sok jabłkowy','','',46,0.1,11.0,0.1,0.2,'nap',[['szklanka (250 ml)',250]]],
+['Piwo jasne 5%','','',43,0.5,3.5,0,0,'nap',[['butelka (500 ml)',500],['puszka (330 ml)',330]]],
+['Wino czerwone wytrawne','','',85,0.1,2.6,0,0,'nap',[['kieliszek (150 ml)',150]]],
+['Wino białe wytrawne','','',82,0.1,2.6,0,0,'nap',[['kieliszek (150 ml)',150]]],
+['Wódka 40%','','',231,0,0,0,0,'nap',[['kieliszek (50 ml)',50]]],
+['Napój energetyczny','','',45,0,11.0,0,0,'nap',[['puszka (250 ml)',250]]],
+
+/* ---- DANIA GOTOWE ---- */
+['Pizza margherita','','',270,11.0,33.0,10.0,2.0,'dan',[['kawałek (100 g)',100],['cała 30 cm (400 g)',400]]],
+['Pierogi ruskie','','',200,5.0,30.0,6.0,1.5,'dan',[['sztuka (35 g)',35],['porcja (250 g)',250]]],
+['Kopytka','','',160,4.0,32.0,1.5,1.5,'dan',[['porcja (200 g)',200]]],
+['Naleśnik z serem','','',210,7.0,28.0,8.0,1.0,'dan',[['sztuka (100 g)',100]]],
+['Spaghetti bolognese','','',150,8.0,17.0,5.5,1.5,'dan',[['porcja (350 g)',350]]],
+['Rosół z makaronem','','',45,3.0,5.0,1.5,0.3,'dan',[['talerz (300 g)',300]]],
+['Zupa pomidorowa z ryżem','','',60,2.0,9.0,1.8,0.8,'dan',[['talerz (300 g)',300]]],
+['Kotlet schabowy panierowany','','',290,18.0,13.0,19.0,0.8,'dan',[['sztuka (130 g)',130]]],
+['Frytki','','',290,3.5,38.0,14.0,3.5,'dan',[['mała porcja (100 g)',100],['duża porcja (150 g)',150]]],
+['Kebab w bułce','','',215,12.0,18.0,10.0,1.5,'dan',[['duży (400 g)',400],['mały (250 g)',250]]],
+['Sushi — rolka z łososiem','','',145,6.0,25.0,2.5,1.0,'dan',[['kawałek (30 g)',30]]],
+['Sałatka grecka','','',110,4.0,5.0,8.0,1.5,'dan',[['porcja (250 g)',250]]],
+['Kanapka z szynką i serem','','',250,13.0,28.0,9.0,2.0,'dan',[['sztuka (120 g)',120]]],
+['Jajecznica na maśle (2 jajka)','','',200,12.0,1.0,17.0,0,'dan',[['porcja (130 g)',130]]],
+['Owsianka na mleku','','',95,4.5,13.0,2.8,1.8,'dan',[['miska (300 g)',300]]],
+
+/* ---- ODŻYWKI ---- */
+['Odżywka białkowa WPC (proszek)','','',380,78.0,6.0,5.0,0,'sup',[['miarka (30 g)',30]]],
+['Odżywka białkowa izolat (proszek)','','',370,88.0,2.0,1.0,0,'sup',[['miarka (30 g)',30]]],
+['Baton proteinowy','','',360,30.0,30.0,12.0,4.0,'sup',[['sztuka (45 g)',45]]],
+['Baton proteinowy','Go Active',B,365,30.0,30.0,12.0,4.0,'sup',[['sztuka (45 g)',45]]],
+['Kreatyna monohydrat','','',0,0,0,0,0,'sup',[['miarka (5 g)',5]]]
+];
+
+/* ============================================================
+   Stan
+   ============================================================ */
+const KEY='miarka.v1';
+const DEF_MEALS=[{id:'b',n:'Śniadanie',e:'🍳'},{id:'l',n:'Obiad',e:'🍲'},{id:'d',n:'Kolacja',e:'🥗'},{id:'s',n:'Przekąski',e:'🍎'}];
+const EMOJI=['🍳','🥐','🥣','🍲','🍝','🥗','🥪','🍎','🍌','☕','🥤','🍚','🥑','🍫','🍪','🌙','🧀','🍗'];
+const MAX_MEALS=8;
+const DEF={
+  settings:{kcal:1800,p:110,c:190,f:60, water:8, sex:'k', age:28, h:167, w:65, act:1.375, goal:-0.15, tipSeen:false,
+            meals:DEF_MEALS,
+            split:false, trainDays:[1,3,5], bonus:300, tEdited:false, marksMigrated:false,
+            tKcal:2100, tP:110, tC:280, tF:60},
+  days:{}, custom:[], recent:[], favEx:[]
+};
+function dayExtra(d){
+  const x=S.days[d];
+  return (x && Array.isArray(x.extra)) ? x.extra : [];
+}
+function meals(d){ return S.settings.meals.concat(dayExtra(d===undefined?curDate:d)) }
+const WDAYS=[[1,'Pn'],[2,'Wt'],[3,'Śr'],[4,'Cz'],[5,'Pt'],[6,'So'],[0,'Nd']];
+/* Dzień jest treningowy tylko wtedy, gdy ktoś go oznaczył na kalendarzu.
+   Żadnej reguły liczonej w locie — to, co widać na siatce, jest całą prawdą. */
+function isTrainDay(d){
+  const x=S.days[d];
+  return !!(x && x.train===true);
+}
+function goalFor(d){
+  const g=S.settings;
+  if(g.split && isTrainDay(d)) return {kcal:g.tKcal, p:g.tP, c:g.tC, f:g.tF, train:true};
+  return {kcal:g.kcal, p:g.p, c:g.c, f:g.f, train:false};
+}
+function mealById(id,d){ return meals(d).find(m=>m.id===id) }
+function isDayMeal(id,d){ return dayExtra(d===undefined?curDate:d).some(m=>m.id===id) }
+function plural(n,a,b,c){
+  const d=n%10, h=n%100;
+  if(n===1) return a;
+  if(d>=2&&d<=4&&!(h>=12&&h<=14)) return b;
+  return c;
+}
+let S = load();
+let curDate = today();
+/* Wcześniejsze wersje liczyły dni treningowe z harmonogramu tygodnia. Teraz liczą się
+   tylko oznaczenia, więc raz odbijamy stary schemat na bieżący i następny miesiąc —
+   inaczej po aktualizacji wszystko po cichu stałoby się nietreningowe. */
+(function migrateTrainMarks(){
+  const g=S.settings;
+  if(!g.split || g.marksMigrated) return;
+  const n=new Date();
+  const to=new Date(n.getFullYear(), n.getMonth()+2, 0);
+  for(let d=new Date(n.getFullYear(), n.getMonth(), 1); d<=to; d.setDate(d.getDate()+1))
+    if((g.trainDays||[]).includes(d.getDay())) day(iso(d)).train=true;
+  g.marksMigrated=true; save();
+})();
+let view='log';
+let libQuery='', libFilter='all';
+let goalTab='rest';
+let exQuery='', exFilter='all';
+let calMonth = today().slice(0,7);
+let weekStart = null;   // ustawiane przy pierwszym renderze
+let calMode = 'view';
+
+function today(){const d=new Date();return iso(d)}
+function iso(d){return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
+function shiftDate(s,n){const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return iso(d)}
+
+function normalize(p){
+  const st={...DEF.settings, ...(p.settings||{})};
+  let M = Array.isArray(st.meals) ? st.meals : null;
+  if(!M || !M.length) M = DEF_MEALS;
+  const seen=new Set();
+  st.meals = M.filter(m=>m&&m.id&&!seen.has(m.id)&&seen.add(m.id))
+              .slice(0,MAX_MEALS)
+              .map(m=>({id:String(m.id), n:String(m.n||'Posiłek').slice(0,28), e:String(m.e||'🍽️')}));
+  if(!st.meals.length) st.meals=structuredClone(DEF_MEALS);
+  st.trainDays = Array.isArray(st.trainDays)
+    ? [...new Set(st.trainDays.map(Number).filter(n=>n>=0&&n<=6))]
+    : [...DEF.settings.trainDays];
+  st.split = !!st.split;
+  for(const k of ['kcal','p','c','f','tKcal','tP','tC','tF','bonus','water'])
+    if(!(typeof st[k]==='number' && isFinite(st[k]) && st[k]>=0)) st[k]=DEF.settings[k];
+  for(const d in (p.days||{})){
+    const x=p.days[d];
+    if(x && Array.isArray(x.extra))
+      x.extra = x.extra.filter(m=>m&&m.id)
+                       .map(m=>({id:String(m.id), n:String(m.n||'Posiłek').slice(0,28), e:String(m.e||'🍽️')}));
+  }
+  return {...structuredClone(DEF), ...p, settings:st};
+}
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(!raw) return structuredClone(DEF);
+    return normalize(JSON.parse(raw));
+  }catch(e){ return structuredClone(DEF) }
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)) }catch(e){ toast('Nie udało się zapisać danych') } }
+
+/* katalog: seed + własne */
+function catalog(){
+  const seed = SEED.map((a,i)=>({id:'s'+i,n:a[0],br:a[1],st:a[2],k:a[3],p:a[4],c:a[5],f:a[6],fb:a[7],cat:a[8],u:a[9]||[]}));
+  return seed.concat(S.custom);
+}
+let CAT = catalog();
+function byId(id){ return CAT.find(x=>x.id===id) }
+
+/* ============================================================
+   Pomocnicze
+   ============================================================ */
+const $ = s=>document.querySelector(s);
+const el = (t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e};
+const r0 = n=>Math.round(n);
+const r1 = n=>Math.round(n*10)/10;
+const d1 = n=>String(Math.round(n*10)/10).replace('.',',');   // polski przecinek dziesiętny
+function norm(s){
+  return (s||'').toLowerCase().replace(/ł/g,'l').normalize('NFD').replace(/[̀-ͯ]/g,'');
+}
+function toast(msg){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'),2100);
+}
+function day(d){
+  if(!S.days[d]) S.days[d]={water:0};
+  const x=S.days[d];
+  for(const m of meals(d)) if(!Array.isArray(x[m.id])) x[m.id]=[];
+  if(typeof x.water!=='number') x.water=0;
+  return x;
+}
+function entryTotals(e){
+  const p=byId(e.pid);
+  if(!p) return {k:0,p:0,c:0,f:0,fb:0,name:'(usunięty produkt)',amt:''};
+  const g=e.g, m=g/100;
+  return {k:p.k*m, p:p.p*m, c:p.c*m, f:p.f*m, fb:(p.fb||0)*m, name:p.n, brand:p.br, prod:p};
+}
+function dayTotals(d){
+  const x=day(d); let t={k:0,p:0,c:0,f:0,fb:0};
+  for(const m of meals(d)) for(const e of x[m.id]){const v=entryTotals(e); t.k+=v.k;t.p+=v.p;t.c+=v.c;t.f+=v.f;t.fb+=v.fb}
+  return t;
+}
+function mealTotal(d,m){ let k=0; for(const e of day(d)[m]) k+=entryTotals(e).k; return k }
+function unitLabel(e){
+  const p=byId(e.pid);
+  if(e.un && e.un!=='g'){ return d1(e.amt)+' × '+e.un.replace(/\s*\(.*\)/,'') }
+  return r0(e.g)+' '+((p&&p.cat==='nap')?'ml':'g');
+}
+function fmtDate(d){
+  const t=today();
+  if(d===t) return 'Dziś';
+  if(d===shiftDate(t,-1)) return 'Wczoraj';
+  if(d===shiftDate(t,1)) return 'Jutro';
+  const D=new Date(d+'T12:00:00');
+  return D.toLocaleDateString('pl-PL',{weekday:'long'}).replace(/^./,c=>c.toUpperCase());
+}
+function fmtSub(d){
+  return new Date(d+'T12:00:00').toLocaleDateString('pl-PL',{day:'numeric',month:'long'});
+}
+
+/* ============================================================
+   Widok: Dziennik
+   ============================================================ */
+function renderTop(){
+  $('#dayTitle').firstChild.nodeValue = fmtDate(curDate);
+  $('#daySub').textContent = fmtSub(curDate);
+  $('#nextDay').disabled = curDate >= today();
+}
+
+function renderSummary(){
+  const t=dayTotals(curDate), g=goalFor(curDate);
+  const left = g.kcal - t.k;
+  const pct = g.kcal>0 ? t.k/g.kcal : 0;
+  const over = pct>1;
+  // pasek: segmenty makro proporcjonalnie do kcal z makro
+  const kp=t.p*4, kc=t.c*4, kf=t.f*9, ksum=Math.max(kp+kc+kf, .0001);
+  const scale = Math.min(pct,1)*100;
+  const seg = x => (x/ksum)*scale;
+
+  const dt = S.settings.split
+    ? `<button class="daytype${g.train?' train':''}" id="dayTypeBtn">${g.train?'💪 Dzień treningowy':'😌 Dzień nietreningowy'} <em>· zmień</em></button>`
+    : '';
+  $('#sum').innerHTML = dt + `
+    <div class="sum-head">
+      <div class="kcal-left">
+        <b class="num">${r0(Math.abs(left))}</b>
+        <span>${left>=0?'kcal zostało':'kcal ponad cel'}</span>
+      </div>
+      <div class="kcal-meta">
+        <b class="num">${r0(t.k)} / ${g.kcal}</b>
+        <span class="num">${r0(pct*100)}% celu</span>
+      </div>
+    </div>
+    <div class="track">
+      ${over?`<i class="over" style="width:100%"></i>`:`
+        <i class="seg-p" style="width:${seg(kp)}%"></i>
+        <i class="seg-c" style="width:${seg(kc)}%"></i>
+        <i class="seg-f" style="width:${seg(kf)}%"></i>`}
+    </div>
+    <div class="track-note"><span>0</span><span class="num">${g.kcal} kcal</span></div>
+    <div class="macros">
+      ${macroBox('Białko',t.p,g.p,'p')}
+      ${macroBox('Węgle',t.c,g.c,'c')}
+      ${macroBox('Tłuszcz',t.f,g.f,'f')}
+    </div>
+    ${t.fb>0?`<p class="note" style="margin-top:11px">Błonnik: <b class="num">${d1(t.fb)} g</b></p>`:''}
+  `;
+  const dtb=$('#dayTypeBtn');
+  if(dtb) dtb.onclick=()=>{
+    toggleTrain(curDate); renderLog();
+    toast(isTrainDay(curDate)?`Dzień treningowy · ${S.settings.tKcal} kcal`:`Dzień nietreningowy · ${S.settings.kcal} kcal`);
+  };
+}
+function macroBox(label,val,goal,key){
+  const pct=goal>0?Math.min(val/goal,1)*100:0;
+  return `<div class="macro">
+    <div class="mh"><span class="dot" style="background:var(--${key})"></span>${label}</div>
+    <div class="mv num">${r0(val)}<u> / ${goal} g</u></div>
+    <div class="mbar"><i style="width:${pct}%;background:var(--${key})"></i></div>
+  </div>`;
+}
+
+function renderMeals(){
+  const box=$('#meals'); box.innerHTML='';
+  const x=day(curDate);
+  for(const m of meals(curDate)){
+    const {id:k,n:name,e:emo}=m;
+    const sec=el('section','meal');
+    const onlyToday = isDayMeal(k,curDate);
+    const h=el('div','meal-h',
+      `<span class="meal-emoji">${emo}</span><h2>${esc(name)}</h2>`+
+      (onlyToday?'<span class="tag today">tylko dziś</span>':'')+
+      `<span class="kc num">${r0(mealTotal(curDate,k))} kcal</span>`+
+      `<svg class="pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.1 2.1 0 00-3-3L5 17z"/></svg>`);
+    h.setAttribute('role','button'); h.tabIndex=0;
+    h.setAttribute('aria-label','Edytuj posiłek '+name);
+    const openIt=()=>openMealEdit(m,{scope:onlyToday?'day':'global', date:curDate});
+    h.onclick=openIt;
+    h.onkeydown=ev=>{ if(ev.key==='Enter'||ev.key===' '){ev.preventDefault(); openIt()} };
+    sec.appendChild(h);
+    const ul=el('ul','items');
+    x[k].forEach((e,i)=>{
+      const v=entryTotals(e);
+      const li=el('li');
+      const b=el('button','item',`
+        <span class="t"><b>${esc(v.name)}${v.brand?` <span style="color:var(--ink-3);font-weight:400">· ${esc(v.brand)}</span>`:''}</b><span>${unitLabel(e)}</span></span>
+        <span class="k num">${r0(v.k)}<u>B ${r0(v.p)} · W ${r0(v.c)} · T ${r0(v.f)}</u></span>`);
+      b.onclick=()=>openEdit(k,i);
+      li.appendChild(b); ul.appendChild(li);
+    });
+    sec.appendChild(ul);
+    const add=el('button','addrow',`<span class="plus">+</span> Dodaj produkt`);
+    add.onclick=()=>openSearch(k);
+    sec.appendChild(add);
+    box.appendChild(sec);
+  }
+  const more=el('button','addmeal','+ Dodaj posiłek do tego dnia');
+  more.onclick=()=>{
+    if(meals(curDate).length>=MAX_MEALS) return toast(`Więcej niż ${MAX_MEALS} posiłków to już przesada`);
+    openMealEdit(null,{scope:'day', date:curDate});
+  };
+  box.appendChild(more);
+}
+
+function renderWater(){
+  const x=day(curDate), goal=S.settings.water;
+  const w=$('#water');
+  w.innerHTML=`<div class="water-h"><b>Woda</b><span class="num">${x.water} / ${goal} szkl. · ${(x.water*0.25).toFixed(2).replace('.',',')} l</span></div><div class="glasses"></div>`;
+  const g=w.querySelector('.glasses');
+  for(let i=0;i<Math.max(goal,x.water);i++){
+    const b=el('button','glass'+(i<x.water?' full':''));
+    b.setAttribute('aria-label',`${i+1} szklanka`);
+    b.onclick=()=>{ x.water = (i+1===x.water)? i : i+1; save(); renderWater() };
+    g.appendChild(b);
+  }
+}
+
+function renderQuick(){
+  const box=$('#quickChips'); box.innerHTML='';
+  const POP=['Jajko kurze (całe)','Płatki owsiane','Pierś z kurczaka (surowa)','Banan',
+             'Chleb żytni razowy','Skyr naturalny','Ryż biały (suchy)','Pomidor','Masło 82%','Jabłko'];
+  const ids = S.recent.length ? S.recent.slice(0,12)
+    : POP.map(n=>{const m=CAT.find(x=>x.n===n && !x.br); return m&&m.id}).filter(Boolean);
+  $('#quickLabel').textContent = S.recent.length? 'Ostatnio dodane' : 'Popularne produkty';
+  let n=0;
+  for(const id of ids){
+    const p=byId(id); if(!p) continue;
+    const c=el('button','chip',`<b>${esc(p.n)}</b><small class="num">${p.k} kcal</small>`);
+    c.onclick=()=>openAmount(p, guessMeal());
+    box.appendChild(c); n++;
+  }
+  if(!n) box.appendChild(el('span','note','Dodaj pierwszy produkt, a pojawi się tutaj.'));
+}
+function guessMeal(){
+  const M=meals(curDate); if(!M.length) return null;
+  const h=new Date().getHours();
+  const want = h<11?'b' : h<16?'l' : h<21?'d' : 's';
+  if(M.some(m=>m.id===want)) return want;
+  const i=Math.round(Math.min(Math.max((h-8)/12,0),1)*(M.length-1));
+  return M[i].id;
+}
+
+function renderTip(){
+  const t=$('#tip'); t.innerHTML='';
+  if(S.settings.tipSeen) return;
+  const b=el('div','banner',`<div class="t"><b>Dodaj Miarkę do ekranu głównego</b>
+    <p>W przeglądarce: <b>Udostępnij → Do ekranu początkowego</b> (iPhone) albo <b>⋮ → Dodaj do ekranu głównego</b> (Android). Będzie działać jak zwykła apka.</p>
+    <button id="tipOk">Rozumiem</button></div>`);
+  t.appendChild(b);
+  $('#tipOk').onclick=()=>{S.settings.tipSeen=true; save(); renderTip()};
+}
+
+function renderLog(){ renderTop(); renderSummary(); renderMeals(); renderWater(); renderQuick(); renderTip() }
+/* ============================================================
+   Widok: Produkty
+   ============================================================ */
+function renderFilters(){
+  const f=$('#libFilters'); f.innerHTML='';
+  const opts=[['all','Wszystko'],['mine','Moje'],[L,'Lidl'],[B,'Biedronka'],
+    ['nab','Nabiał'],['mie','Mięso i ryby'],['zbo','Zboża'],['war','Warzywa'],['owo','Owoce'],
+    ['orz','Orzechy'],['tlu','Tłuszcze'],['slo','Słodycze'],['nap','Napoje'],['dan','Dania'],['sup','Odżywki']];
+  for(const [v,lab] of opts){
+    const b=el('button','fbtn'+(libFilter===v?' on':''),lab);
+    b.onclick=()=>{libFilter=v; renderFilters(); renderLib()};
+    f.appendChild(b);
+  }
+}
+function searchProducts(q,filter,limit){
+  const nq=norm(q).trim();
+  const words=nq?nq.split(/\s+/):[];
+  let out=[];
+  for(const p of CAT){
+    if(filter==='mine' && !p.own) continue;
+    if(filter===L && p.st!==L) continue;
+    if(filter===B && p.st!==B) continue;
+    if(filter!=='all'&&filter!=='mine'&&filter!==L&&filter!==B && p.cat!==filter) continue;
+    if(words.length){
+      const hay=norm(p.n+' '+(p.br||'')+' '+(p.st||''));
+      if(!words.every(w=>hay.includes(w))) continue;
+      const i=norm(p.n).indexOf(words[0]);
+      out.push([p, i===0?0:(i>0?1:2)]);
+    } else out.push([p,1]);
+  }
+  out.sort((a,b)=>a[1]-b[1] || a[0].n.localeCompare(b[0].n,'pl'));
+  return out.slice(0,limit||60).map(a=>a[0]);
+}
+function prodRow(p,onClick){
+  const li=el('li');
+  const tags=[];
+  if(p.st===L) tags.push('<span class="tag lidl">Lidl</span>');
+  if(p.st===B) tags.push('<span class="tag biedronka">Biedronka</span>');
+  if(p.own) tags.push('<span class="tag own">Moje</span>');
+  const b=el('button','prod',`
+    <span class="t"><b>${esc(p.n)}</b>
+      <span>${tags.join('')}${p.br?`<i style="font-style:normal">${esc(p.br)}</i>`:''}
+        <i class="macro-mini"><i class="a">B ${d1(p.p)}</i><i class="b">W ${d1(p.c)}</i><i class="c">T ${d1(p.f)}</i></i>
+      </span></span>
+    <span class="k num">${r0(p.k)}<u>kcal / 100 ${p.cat==='nap'?'ml':'g'}</u></span>`);
+  b.onclick=()=>onClick(p);
+  li.appendChild(b); return li;
+}
+function renderLib(){
+  const list=$('#libList'); list.innerHTML='';
+  const res=searchProducts(libQuery,libFilter);
+  for(const p of res) list.appendChild(prodRow(p, x=>openAmount(x, guessMeal())));
+  const e=$('#libEmpty');
+  e.innerHTML = res.length? '' :
+    `<div class="empty"><b>Nic nie znaleziono</b>Spróbuj krótszego słowa albo dodaj ten produkt z etykiety.</div>`;
+  $('#libClear').hidden = !libQuery;
+}
+
+/* ============================================================
+   Widok: Ja (cele, kalkulator, backup)
+   ============================================================ */
+function renderMe(){
+  const g=S.settings;
+  if(!g.split) goalTab='rest';
+  const T = goalTab==='train';
+  const K=T?'tKcal':'kcal', P=T?'tP':'p', C=T?'tC':'c', F=T?'tF':'f';
+  const kcalFromMacros = g[P]*4+g[C]*4+g[F]*9;
+  $('#v-me').innerHTML = `
+    <section class="sec">
+      <span class="label">Moje cele dzienne</span>
+      <div class="card">
+        <div class="field"><label>Inne cele w dni treningowe <small>Osobny limit na dni z treningiem</small></label>
+          <button class="sw${g.split?' on':''}" id="gSplit" role="switch" aria-checked="${g.split}" aria-label="Rozdziel cele na dni treningowe"><i></i></button></div>
+      </div>
+      ${g.split?`<div class="seg" id="goalSeg">
+        <button data-t="rest" class="${T?'':'on'}">😌 Nietreningowy</button>
+        <button data-t="train" class="${T?'on':''}">💪 Treningowy</button>
+      </div>`:''}
+      <div class="card" id="goalCard">
+        <div class="field"><label>Kalorie <small>kcal na dzień</small></label><input id="gKcal" type="number" inputmode="numeric" value="${g[K]}"></div>
+        <div class="field"><label>Białko <small>g</small></label><input id="gP" type="number" inputmode="numeric" value="${g[P]}"></div>
+        <div class="field"><label>Węglowodany <small>g</small></label><input id="gC" type="number" inputmode="numeric" value="${g[C]}"></div>
+        <div class="field"><label>Tłuszcz <small>g</small></label><input id="gF" type="number" inputmode="numeric" value="${g[F]}"></div>
+      </div>
+      <p class="note">${g.split?`Cel dla dnia <b>${T?'treningowego':'nietreningowego'}</b>. Które dni są treningowe, zaznaczysz w zakładce <b>Plan</b>. `:''}Z makro wychodzi <b class="num">${r0(kcalFromMacros)} kcal</b>${Math.abs(kcalFromMacros-g[K])>60?` — to spory rozjazd z celem ${g[K]} kcal.`:'.'}</p>
+    </section>
+
+
+    <section class="sec">
+      <span class="label">Woda</span>
+      <div class="card">
+        <div class="field"><label>Cel dzienny <small>szklanek po 250 ml</small></label><input id="gW" type="number" inputmode="numeric" value="${g.water}"></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <span class="label">Wylicz cel automatycznie</span>
+      <div class="card">
+        <div class="field"><label>Płeć</label><select id="cSex"><option value="k"${g.sex==='k'?' selected':''}>Kobieta</option><option value="m"${g.sex==='m'?' selected':''}>Mężczyzna</option></select></div>
+        <div class="field"><label>Wiek <small>lat</small></label><input id="cAge" type="number" inputmode="numeric" value="${g.age}"></div>
+        <div class="field"><label>Wzrost <small>cm</small></label><input id="cH" type="number" inputmode="numeric" value="${g.h}"></div>
+        <div class="field"><label>Waga <small>kg</small></label><input id="cW" type="number" inputmode="decimal" value="${g.w}"></div>
+        <div class="field"><label>Aktywność</label><select id="cAct">
+          <option value="1.2"${g.act==1.2?' selected':''}>Siedząca</option>
+          <option value="1.375"${g.act==1.375?' selected':''}>Lekka (1–3 dni)</option>
+          <option value="1.55"${g.act==1.55?' selected':''}>Średnia (3–5 dni)</option>
+          <option value="1.725"${g.act==1.725?' selected':''}>Duża (6–7 dni)</option>
+          <option value="1.9"${g.act==1.9?' selected':''}>Bardzo duża</option></select></div>
+        ${g.split?`<div class="field"><label>Dodatek treningowy <small>kcal ponad dzień wolny</small></label><input id="cBonus" type="number" inputmode="numeric" value="${g.bonus}"></div>`:''}
+        <div class="field"><label>Cel</label><select id="cGoal">
+          <option value="-0.2"${g.goal==-0.2?' selected':''}>Chudnięcie (szybciej)</option>
+          <option value="-0.15"${g.goal==-0.15?' selected':''}>Chudnięcie</option>
+          <option value="0"${g.goal==0?' selected':''}>Utrzymanie wagi</option>
+          <option value="0.1"${g.goal==0.1?' selected':''}>Budowa masy</option></select></div>
+      </div>
+      <div id="calcOut"></div>
+      <button class="btn" id="applyCalc" style="margin-top:12px">Ustaw wyliczone cele</button>
+      <p class="note">Wzór Mifflin-St Jeor. To punkt startowy, nie wyrocznia — po 2–3 tygodniach skoryguj według tego, co pokazuje waga.</p>
+    </section>
+
+    <section class="sec">
+      <span class="label">Kopia zapasowa</span>
+      <div class="card">
+        <button class="row" id="doExport"><span class="t"><b>Skopiuj moje dane</b><span>Wrzuć do notatek — na wypadek zmiany telefonu</span></span></button>
+        <button class="row" id="doImport"><span class="t"><b>Wczytaj z kopii</b><span>Wklej wcześniej skopiowany tekst</span></span></button>
+      </div>
+      <p class="note">Wszystko siedzi <b>tylko na tym telefonie</b>, w pamięci przeglądarki. Nic nie leci na żaden serwer. Czyszczenie danych przeglądarki skasuje też dziennik — dlatego kopia.</p>
+      <div class="btn-row"><button class="btn danger" id="wipe">Wyczyść wszystkie dane</button></div>
+    </section>
+    <p class="note" style="margin-top:22px;text-align:center">Miarka · wartości odżywcze są przybliżone i mają charakter orientacyjny.<br>Nie zastępują porady dietetyka ani lekarza.</p>
+  `;
+
+  const bind=(id,key,int,marks)=>{
+    const i=$(id); if(!i) return;
+    i.onchange=()=>{
+      const v=parseFloat(i.value.replace(',','.'));
+      if(isNaN(v)||v<0) return;
+      S.settings[key]=int?Math.round(v):v;
+      if(marks) S.settings.tEdited=true;
+      save(); renderMe(); if(view==='log')renderLog();
+    };
+  };
+  bind('#gKcal',K,1,T); bind('#gP',P,1,T); bind('#gC',C,1,T); bind('#gF',F,1,T);
+  bind('#gW','water',1); bind('#cBonus','bonus',1);
+
+  $('#gSplit').onclick=()=>{
+    S.settings.split=!S.settings.split;
+    if(S.settings.split && !S.settings.tEdited) deriveTrainGoal();
+    save(); renderMe(); renderLog();
+  };
+  const seg=$('#goalSeg');
+  if(seg) [...seg.children].forEach(bt=>bt.onclick=()=>{goalTab=bt.dataset.t; renderMe()});
+  ['#cSex','#cAge','#cH','#cW','#cAct','#cGoal'].forEach(id=>{ $(id).onchange=()=>{readCalc(); calcOut()} });
+  $('#applyCalc').onclick=()=>{
+    const r=calc(); S.settings.kcal=r.kcal; S.settings.p=r.p; S.settings.c=r.c; S.settings.f=r.f;
+    if(S.settings.split){ deriveTrainGoal(); S.settings.tEdited=false }
+    save(); renderMe(); toast('Cele ustawione');
+  };
+  $('#doExport').onclick=exportData;
+  $('#doImport').onclick=importData;
+  $('#wipe').onclick=()=>{
+    openSheet('Wyczyścić wszystko?','Znikną wszystkie wpisy, własne produkty i ustawienia. Tego nie da się cofnąć.',
+      b=>{
+        const y=el('button','btn danger','Tak, usuń wszystko'); y.style.marginTop='6px';
+        y.onclick=()=>{ localStorage.removeItem(KEY); S=load(); CAT=catalog(); closeSheet(); renderAll(); toast('Wyczyszczono') };
+        const n=el('button','btn ghost','Anuluj'); n.style.marginTop='9px'; n.onclick=closeSheet;
+        b.appendChild(y); b.appendChild(n);
+      });
+  };
+  calcOut();
+}
+function readCalc(){
+  S.settings.sex=$('#cSex').value;
+  S.settings.age=+$('#cAge').value||28;
+  S.settings.h=+$('#cH').value||167;
+  S.settings.w=parseFloat(($('#cW').value||'65').replace(',','.'))||65;
+  S.settings.act=+$('#cAct').value;
+  S.settings.goal=+$('#cGoal').value;
+  save();
+}
+function calc(){
+  const g=S.settings;
+  const bmr = 10*g.w + 6.25*g.h - 5*g.age + (g.sex==='m'?5:-161);
+  const tdee = bmr*g.act;
+  const kcal = Math.round((tdee*(1+g.goal))/10)*10;
+  const p = Math.round(g.w*1.8);
+  const f = Math.round(g.w*0.9);
+  const c = Math.max(0, Math.round((kcal - p*4 - f*9)/4));
+  return {bmr:Math.round(bmr), tdee:Math.round(tdee), kcal, p, c, f};
+}
+function calcOut(){
+  const r=calc();
+  $('#calcOut').innerHTML=`<div class="preview" style="margin-top:12px">
+    <div class="kc"><span class="n num">${r.kcal}</span><span class="l">kcal</span></div>
+    <div class="pp"><span class="n num">${r.p}</span><span class="l">Białko</span></div>
+    <div class="cc"><span class="n num">${r.c}</span><span class="l">Węgle</span></div>
+    <div class="ff"><span class="n num">${r.f}</span><span class="l">Tłuszcz</span></div>
+  </div>
+  <p class="note">Przemiana spoczynkowa <b class="num">${r.bmr} kcal</b> · z aktywnością <b class="num">${r.tdee} kcal</b>${
+    S.settings.split?` · w dniu treningowym <b class="num">${r.kcal+(S.settings.bonus||0)} kcal</b>`:''}</p>`;
+}
+/* Dzień treningowy = dzień wolny + dodatek, w całości z węglowodanów.
+   Białko i tłuszcz zostają — zmienia się paliwo, nie budulec. */
+function deriveTrainGoal(){
+  const g=S.settings, b=g.bonus||0;
+  g.tKcal=g.kcal+b; g.tP=g.p; g.tF=g.f; g.tC=g.c+Math.round(b/4);
+}
+function renderWdays(){
+  const w=$('#wdays'); if(!w) return;
+  w.innerHTML='';
+  for(const [n,lab] of WDAYS){
+    const on=(S.settings.trainDays||[]).includes(n);
+    const bt=el('button',on?'on':'',lab);
+    bt.setAttribute('aria-pressed',String(on));
+    bt.setAttribute('aria-label',lab+(on?' — treningowy':' — nietreningowy'));
+    bt.onclick=()=>{
+      const set=new Set(S.settings.trainDays||[]);
+      set.has(n)?set.delete(n):set.add(n);
+      S.settings.trainDays=[...set];
+      save(); renderWdays();       // sam wzorzec — siatkę zmienia dopiero „Zaznacz wg schematu”
+    };
+    w.appendChild(bt);
+  }
+}
+function mondayOf(d){
+  const x=new Date(d+'T12:00:00');
+  x.setDate(x.getDate()-((x.getDay()+6)%7));
+  return iso(x);
+}
+function weekDates(start){ const o=[]; for(let i=0;i<7;i++) o.push(shiftDate(start,i)); return o }
+function weekLabel(start){
+  const a=new Date(start+'T12:00:00'), b=new Date(shiftDate(start,6)+'T12:00:00');
+  return a.getMonth()===b.getMonth()
+    ? `${a.getDate()}–${b.toLocaleDateString('pl-PL',{day:'numeric',month:'long'})}`
+    : `${a.toLocaleDateString('pl-PL',{day:'numeric',month:'short'})} – ${b.toLocaleDateString('pl-PL',{day:'numeric',month:'short'})}`;
+}
+/* Liczymy wyłącznie z dni, w których coś zapisała. Doliczanie pustych dni
+   pokazywałoby fikcyjny deficyt — dzień bez wpisów to brak danych, nie zero kalorii. */
+function weekStats(start){
+  const per=[]; let eaten=0, goal=0, logged=0, train=0, prot=0;
+  for(const d of weekDates(start)){
+    const t=dayTotals(d), g=goalFor(d), has=t.k>0;
+    if(has){ logged++; eaten+=t.k; goal+=g.kcal; prot+=t.p }
+    if(S.settings.split && isTrainDay(d)) train++;
+    per.push({d, k:t.k, goal:g.kcal, pct:g.kcal>0?t.k/g.kcal:0,
+              train:S.settings.split&&isTrainDay(d), future:d>today(), has});
+  }
+  return {per, eaten, goal, logged, train, prot};
+}
+function calCells(ym){
+  const [y,m]=ym.split('-').map(Number);
+  const start=(new Date(y,m-1,1).getDay()+6)%7;      // poniedziałek = 0
+  const len=new Date(y,m,0).getDate();
+  const out=new Array(start).fill(null);
+  for(let i=1;i<=len;i++) out.push(iso(new Date(y,m-1,i)));
+  while(out.length%7) out.push(null);
+  return out;
+}
+function shiftMonth(ym,n){
+  const [y,m]=ym.split('-').map(Number);
+  const d=new Date(y,m-1+n,1);
+  return iso(d).slice(0,7);
+}
+function toggleTrain(d){
+  const x=day(d);
+  if(x.train===true) delete x.train; else x.train=true;
+  save();
+}
+function renderCalendar(box, opts){
+  opts=opts||{};
+  const canMark = S.settings.split && opts.allowMark!==false;
+  const marking = canMark && calMode==='mark';
+  const cells=calCells(calMonth);
+  const [y,m]=calMonth.split('-').map(Number);
+  const name=new Date(y,m-1,1).toLocaleDateString('pl-PL',{month:'long',year:'numeric'});
+  const tMonth=today().slice(0,7);
+
+  box.innerHTML=`
+    <div class="cal-h">
+      <button class="navbtn" id="calPrev" aria-label="Poprzedni miesiąc"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <b>${name.replace(/^./,c=>c.toUpperCase())}</b>
+      <button class="navbtn" id="calNext" aria-label="Następny miesiąc"${calMonth>=tMonth?' disabled':''}><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    ${canMark?`<div class="seg" id="calSeg" style="margin:0 11px 8px">
+      <button data-m="view" class="${marking?'':'on'}">Podgląd</button>
+      <button data-m="mark" class="${marking?'on':''}">💪 Oznacz treningi</button></div>`:''}
+    <div class="cal-w">${['Pn','Wt','Śr','Cz','Pt','So','Nd'].map(d=>`<span>${d}</span>`).join('')}</div>
+    <div class="cal-g" id="calG"></div>
+    <p class="cal-hint">${marking
+      ? 'Dotknij dni, w które trenuje — także tych w przód. Zielone = treningowy.'
+      : (canMark?'Dotknij dnia, żeby go otworzyć w Dzienniku. Zielone pola to dni treningowe.'
+               : 'Dotknij dnia, żeby go otworzyć w Dzienniku. Pasek pokazuje, ile z celu zostało zjedzone.')}</p>
+    ${marking?`<div style="padding:0 11px 13px">
+      <span class="label" style="display:block;margin-bottom:7px">Schemat tygodnia</span>
+      <div style="border:1px solid var(--line);border-radius:14px;background:var(--surface-2)"><div class="wdays" id="wdays"></div></div>
+      <div class="btn-row">
+        <button class="btn ghost" id="calFill">Zaznacz wg schematu</button>
+        <button class="btn ghost" id="calClear">Wyczyść miesiąc</button>
+      </div>
+      <p class="cal-hint" style="padding:9px 2px 0">Skrót na zapisanie całego miesiąca jednym ruchem. Pojedyncze dni i tak poprawisz dotknięciem.</p>
+    </div>`:''}
+    <div class="mstats" id="calStats"></div>`;
+
+  const g=box.querySelector('#calG');
+  let logged=0, sum=0, trainN=0;
+  for(const d of cells){
+    if(!d){ g.appendChild(el('div','cal-c blank')); continue }
+    const t=dayTotals(d), gl=goalFor(d);
+    const isT=S.settings.split && isTrainDay(d);
+    const future = d>today();
+    const pct = gl.kcal>0 ? t.k/gl.kcal : 0;
+    if(t.k>0){ logged++; sum+=t.k }
+    if(isT) trainN++;
+    const cls=['cal-c','pick'];
+    if(isT) cls.push('train');
+    if(d===today()) cls.push('now');
+    if(future) cls.push('future');
+    if(pct>1.05) cls.push('over');
+    const c=el('button',cls.join(' '),
+      `<span class="dn">${+d.slice(8)}</span>
+       <span class="bar"><i style="width:${Math.min(pct,1)*100}%"></i></span>`);
+    c.setAttribute('aria-label',`${d}${isT?', treningowy':''}${t.k>0?', '+r0(t.k)+' kcal':''}`);
+    c.onclick=()=>{
+      if(marking){ toggleTrain(d); renderCalendar(box,opts); renderLog() }
+      else if(!future){ curDate=d; renderLog(); if(opts.onPick) opts.onPick(d); else switchView('log') }
+      else toast('Ten dzień jeszcze nie nadszedł');
+    };
+    g.appendChild(c);
+  }
+
+  box.querySelector('#calStats').innerHTML=`
+    <div><span class="n">${logged}</span><span class="l">${plural(logged,'DZIEŃ Z WPISAMI','DNI Z WPISAMI','DNI Z WPISAMI')}</span></div>
+    <div><span class="n">${logged?r0(sum/logged):'—'}</span><span class="l">ŚREDNIO KCAL</span></div>
+    <div><span class="n">${S.settings.split?trainN:'—'}</span><span class="l">DNI TRENINGOWYCH</span></div>`;
+
+  box.querySelector('#calPrev').onclick=()=>{calMonth=shiftMonth(calMonth,-1); renderCalendar(box,opts)};
+  const nx=box.querySelector('#calNext');
+  if(!nx.disabled) nx.onclick=()=>{calMonth=shiftMonth(calMonth,1); renderCalendar(box,opts)};
+  const seg=box.querySelector('#calSeg');
+  if(seg) [...seg.children].forEach(bt=>bt.onclick=()=>{calMode=bt.dataset.m; renderCalendar(box,opts)});
+  renderWdays();
+  const fill=box.querySelector('#calFill');
+  if(fill) fill.onclick=()=>{
+    const pat=S.settings.trainDays||[];
+    if(!pat.length) return toast('Najpierw zaznacz dni tygodnia');
+    let n=0;
+    for(const d of cells)
+      if(d && !isTrainDay(d) && pat.includes(new Date(d+'T12:00:00').getDay())){ day(d).train=true; n++ }
+    save(); renderCalendar(box,opts); renderLog();
+    toast(n?`Zaznaczono ${n} ${plural(n,'dzień','dni','dni')}`:'Te dni są już zaznaczone');
+  };
+  const clr=box.querySelector('#calClear');
+  if(clr) clr.onclick=()=>{
+    let n=0;
+    for(const d of cells) if(d && S.days[d] && S.days[d].train===true){ delete S.days[d].train; n++ }
+    save(); renderCalendar(box,opts); renderLog();
+    toast(n?`Odznaczono ${n} ${plural(n,'dzień','dni','dni')}`:'Nie było żadnych oznaczeń');
+  };
+}
+function renderWeek(){
+  const box=$('#weekCard'); if(!box) return;
+  if(!weekStart) weekStart=mondayOf(today());
+  const st=weekStats(weekStart);
+  const thisWeek=mondayOf(today());
+  const bal=st.eaten-st.goal;
+  const H=70;                                  // wysokość słupka przy 100% celu
+  const barPx=p=>Math.max(3, Math.min(p,1.45)*H);
+
+  box.innerHTML=`
+    <div class="wk-nav">
+      <button class="navbtn" id="wkPrev" aria-label="Poprzedni tydzień"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <span class="t"><b>${weekLabel(weekStart)}</b><span>${
+        weekStart===thisWeek?'Ten tydzień'
+        :weekStart===shiftDate(thisWeek,-7)?'Poprzedni tydzień'
+        :new Date(weekStart+'T12:00:00').getFullYear()}</span></span>
+      <button class="navbtn" id="wkNext" aria-label="Następny tydzień"${weekStart>=thisWeek?' disabled':''}><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <div class="wk-chart" id="wkChart">
+      <div class="wk-goal" style="bottom:${H}px"><i>cel</i></div>
+    </div>
+    <div class="wk-days">${st.per.map(x=>
+      `<span class="${[x.train?'tr':'', x.d===today()?'now':''].filter(Boolean).join(' ')}">${['Pn','Wt','Śr','Cz','Pt','So','Nd'][(new Date(x.d+'T12:00:00').getDay()+6)%7]}</span>`).join('')}</div>
+    <div class="mstats">
+      <div><span class="n">${st.logged?r0(st.eaten).toLocaleString('pl-PL'):'—'}</span><span class="l">ZJEDZONE KCAL</span></div>
+      <div><span class="n">${st.logged?r0(st.eaten/st.logged):'—'}</span><span class="l">ŚREDNIO / DZIEŃ</span></div>
+      <div><span class="n" style="color:${!st.logged?'':(bal>st.goal*0.05?'var(--over)':'var(--accent)')}">${
+        st.logged?(bal>=0?'+':'−')+r0(Math.abs(bal)):'—'}</span><span class="l">BILANS VS CEL</span></div>
+    </div>
+    <div class="wk-foot" id="wkFoot"></div>`;
+
+  const ch=box.querySelector('#wkChart');
+  for(const x of st.per){
+    const cls=['wk-bar'];
+    if(!x.has) cls.push(x.future?'fut':'none');
+    else if(x.pct>1.05) cls.push('over');
+    const b=el('button',cls.join(' '),
+      `${x.has?`<span class="v">${r0(x.k)}</span>`:''}<span class="col" style="height:${x.has?barPx(x.pct):6}px"></span>`);
+    b.setAttribute('aria-label',`${x.d}${x.has?', '+r0(x.k)+' z '+x.goal+' kcal':', brak wpisów'}`);
+    b.onclick=()=>{ if(x.future) return toast('Ten dzień jeszcze nie nadszedł');
+                    curDate=x.d; renderLog(); switchView('log') };
+    ch.appendChild(b);
+  }
+
+  const foot=box.querySelector('#wkFoot');
+  if(!st.logged){
+    foot.innerHTML='W tym tygodniu nie ma jeszcze żadnych wpisów.';
+  }else{
+    const tdee=calc().tdee, burned=tdee*st.logged, net=st.eaten-burned, kg=net/7700;
+    foot.innerHTML=`
+      <b>${st.logged}</b> ${plural(st.logged,'dzień z wpisami','dni z wpisami','dni z wpisami')}
+      ${S.settings.split?` · <b>${st.train}</b> ${plural(st.train,'trening','treningi','treningów')}`:''}
+      · średnio <b>${r0(st.prot/st.logged)} g</b> białka
+      <span class="sub">Szacunkowo spalone <b>${r0(burned).toLocaleString('pl-PL')} kcal</b> · bilans
+        <b>${net>=0?'+':'−'}${r0(Math.abs(net)).toLocaleString('pl-PL')} kcal</b> ≈
+        <b>${net>=0?'+':'−'}${Math.abs(kg).toFixed(2).replace('.',',')} kg</b>.
+        Szacunek z przemiany materii (${r0(tdee)} kcal/dzień) — bez treningów, liczony tylko z dni z wpisami.</span>`;
+  }
+
+  box.querySelector('#wkPrev').onclick=()=>{weekStart=shiftDate(weekStart,-7); renderWeek()};
+  const nx=box.querySelector('#wkNext');
+  if(!nx.disabled) nx.onclick=()=>{weekStart=shiftDate(weekStart,7); renderWeek()};
+}
+function renderMonth(){
+  const box=$('#monthCard'); if(!box) return;
+  renderCalendar(box,{});
+}
+function openCalendarSheet(){
+  calMonth=curDate.slice(0,7);
+  openSheet('Wybierz dzień','', b=>{
+    const box=el('div','card');
+    b.appendChild(box);
+    renderCalendar(box,{allowMark:false, onPick:()=>{closeSheet(); switchView('log')}});
+  });
+}
+function mealEntryCount(id){
+  let n=0;
+  for(const d in S.days){ const a=S.days[d][id]; if(Array.isArray(a)) n+=a.length }
+  return n;
+}
+function renderMealsEditor(){
+  const c=$('#mealsCard'); if(!c) return;
+  c.innerHTML='';
+  const M=S.settings.meals;
+  M.forEach((m,i)=>{
+    const n=mealEntryCount(m.id);
+    const row=el('div','mealrow');
+    const pick=el('button','pick',
+      `<span class="emo">${m.e}</span><span style="flex:1;min-width:0"><b>${esc(m.n)}</b>
+       <span>${n? n+' '+plural(n,'wpis','wpisy','wpisów') : 'brak wpisów'}</span></span>`);
+    pick.onclick=()=>openMealEdit(m,{scope:'global'});
+    const up=el('button','mini','<svg viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>');
+    up.setAttribute('aria-label','Wyżej'); up.disabled = i===0;
+    up.onclick=()=>moveMeal(i,-1);
+    const dn=el('button','mini','<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>');
+    dn.setAttribute('aria-label','Niżej'); dn.disabled = i===M.length-1;
+    dn.onclick=()=>moveMeal(i,1);
+    row.appendChild(pick); row.appendChild(up); row.appendChild(dn);
+    c.appendChild(row);
+  });
+}
+function moveMeal(i,dir){
+  const M=S.settings.meals, j=i+dir;
+  if(j<0||j>=M.length) return;
+  [M[i],M[j]]=[M[j],M[i]];
+  save(); renderMealsEditor(); renderLog();
+}
+function openMealEdit(m, opts){
+  opts = opts || {};
+  const date = opts.date || curDate;
+  const isNew = !m;
+  const wasDay = opts.scope === 'day';
+  let emo = m ? m.e : EMOJI[0];
+  let scope = isNew ? (opts.scope || 'global') : (wasDay ? 'day' : 'global');
+  // stały posiłek zostaje stały — cofanie go do jednego dnia osierociłoby wpisy z innych dni
+  const canChoose = isNew || wasDay;
+
+  openSheet(isNew ? 'Nowy posiłek' : 'Edytuj posiłek',
+    isNew ? 'Np. II śniadanie albo Podwieczorek' : '', b=>{
+    b.innerHTML=`
+      <label class="inp"><span>NAZWA</span><input id="mN" maxlength="28" value="${m?esc(m.n):''}" placeholder="np. II śniadanie"></label>
+      <div style="margin-top:15px"><span class="label">Ikona</span><div class="emojis" id="mE" style="margin-top:8px"></div></div>
+      ${canChoose?`<div style="margin-top:16px"><span class="label">Jak często?</span>
+        <div class="mealpick" id="mSc">
+          <button class="mp" data-s="day">📅 Tylko ten dzień</button>
+          <button class="mp" data-s="global">🔁 Codziennie</button>
+        </div>
+        <p class="note" id="mScN"></p></div>`:''}
+      <button class="btn" id="mS" style="margin-top:17px">${isNew?'Dodaj posiłek':'Zapisz'}</button>
+      ${isNew?'':'<button class="btn danger" id="mD" style="margin-top:9px">Usuń posiłek</button>'}`;
+
+    const box=b.querySelector('#mE');
+    const drawE=()=>{
+      box.innerHTML='';
+      for(const e of EMOJI){
+        const bt=el('button', e===emo?'on':'', e);
+        bt.setAttribute('aria-label','Ikona '+e);
+        bt.onclick=()=>{emo=e; drawE()};
+        box.appendChild(bt);
+      }
+    };
+    drawE();
+
+    if(canChoose){
+      const sc=b.querySelector('#mSc'), note=b.querySelector('#mScN');
+      const drawS=()=>{
+        [...sc.children].forEach(c=>c.classList.toggle('on', c.dataset.s===scope));
+        note.innerHTML = scope==='day'
+          ? `Pojawi się tylko w dniu <b>${fmtSub(date)}</b>. Inne dni zostają bez zmian.`
+          : `Będzie w każdym dniu — tak jak śniadanie czy obiad.`;
+      };
+      [...sc.children].forEach(c=>c.onclick=()=>{scope=c.dataset.s; drawS()});
+      drawS();
+    }
+
+    b.querySelector('#mS').onclick=()=>{
+      const name=b.querySelector('#mN').value.trim();
+      if(!name) return toast('Wpisz nazwę posiłku');
+      if(isNew){
+        const nm={id:'m'+Date.now().toString(36), n:name, e:emo};
+        if(scope==='day'){
+          const x=day(date);
+          if(!Array.isArray(x.extra)) x.extra=[];
+          x.extra.push(nm); x[nm.id]=[];
+        } else S.settings.meals.push(nm);
+      }else{
+        m.n=name; m.e=emo;
+        if(wasDay && scope==='global'){          // „zostaw na stałe” — wpisy zachowują to samo id
+          const x=day(date);
+          x.extra=(x.extra||[]).filter(y=>y.id!==m.id);
+          S.settings.meals.push(m);
+        }
+      }
+      save(); closeSheet(); renderLog(); renderMealsEditor();
+      toast(isNew ? (scope==='day'?'Dodano na ten dzień':'Dodano posiłek')
+                  : (wasDay&&scope==='global' ? 'Od teraz codziennie' : 'Zapisano'));
+    };
+    if(!isNew) b.querySelector('#mD').onclick=()=>confirmDeleteMeal(m,{scope, date});
+  });
+}
+function confirmDeleteMeal(m, opts){
+  opts=opts||{};
+  const date=opts.date||curDate;
+  const isDay=opts.scope==='day';
+  const pool = isDay ? meals(date) : S.settings.meals;
+  if(pool.length<=1){
+    toast(isDay?'Musi zostać przynajmniej jeden posiłek':'Musi zostać przynajmniej jeden stały posiłek');
+    return;
+  }
+  // cel przeniesienia musi istnieć w każdym dniu, z którego przenosimy wpisy
+  const target = (isDay ? meals(date) : S.settings.meals).find(x=>x.id!==m.id);
+  const n = isDay ? (day(date)[m.id]||[]).length : mealEntryCount(m.id);
+  openSheet(`Usunąć „${m.n}”?`,
+    n ? `${n} ${plural(n,'wpis zostanie przeniesiony','wpisy zostaną przeniesione','wpisów zostanie przeniesionych')} do „${target.n}”.`
+      : (isDay?'W tym posiłku nie ma żadnych wpisów.':'Ten posiłek zniknie ze wszystkich dni.'), b=>{
+    const y=el('button','btn danger','Usuń posiłek'); y.style.marginTop='4px';
+    y.onclick=()=>{
+      const move=(x)=>{
+        if(Array.isArray(x[m.id]) && x[m.id].length) x[target.id]=(x[target.id]||[]).concat(x[m.id]);
+        delete x[m.id];
+      };
+      if(isDay){
+        const x=day(date);
+        move(x);
+        x.extra=(x.extra||[]).filter(y2=>y2.id!==m.id);
+      }else{
+        for(const d in S.days) move(S.days[d]);
+        S.settings.meals=S.settings.meals.filter(x=>x.id!==m.id);
+      }
+      save(); closeSheet(); renderLog(); renderMealsEditor();
+      toast(n?`Przeniesiono do „${target.n}”`:'Usunięto');
+    };
+    const no=el('button','btn ghost','Anuluj'); no.style.marginTop='9px'; no.onclick=closeSheet;
+    b.appendChild(y); b.appendChild(no);
+  });
+}
+/* ============================================================
+   ATLAS ĆWICZEŃ
+   [nazwa, partia główna, partie pomocnicze, sprzęt, poziom, jak wykonać, częste błędy, wskazówka]
+   ============================================================ */
+const EXG=[['klatka','Klatka'],['plecy','Plecy'],['barki','Barki'],['biceps','Biceps'],
+           ['triceps','Triceps'],['nogi','Nogi'],['posladki','Pośladki'],['brzuch','Brzuch'],
+           ['lydki','Łydki'],['cardio','Cardio']];
+const EXLVL=['','Początkujący','Średni','Zaawansowany'];
+const EX=[
+/* ---------------- KLATKA ---------------- */
+['Wyciskanie sztangi na ławce płaskiej','klatka',['triceps','barki'],'Sztanga',2,
+ ['Połóż się tak, żeby oczy były pod gryfem. Stopy płasko na podłodze.',
+  'Ściągnij łopatki do siebie i w dół — klatka lekko wypchnięta, plecy stabilne.',
+  'Chwyć gryf nieco szerzej niż barki, nadgarstki proste nad łokciami.',
+  'Opuszczaj kontrolowanie do dolnej części klatki, łokcie pod kątem około 45 stopni do tułowia.',
+  'Dotknij klatki bez odbijania i wypchnij sztangę po lekkim łuku w górę.'],
+ ['Odbijanie sztangi od klatki — zabiera pracę mięśniom i obciąża żebra.',
+  'Rozchylanie łokci na boki pod kątem prostym — częsta przyczyna bólu barku.',
+  'Odrywanie pośladków od ławki, żeby wycisnąć więcej.'],
+ 'Bez asekuracji nie dokładaj ciężaru, przy którym ostatnie powtórzenie jest niepewne.'],
+
+['Wyciskanie hantli na ławce płaskiej','klatka',['triceps','barki'],'Hantle',1,
+ ['Usiądź na ławce z hantlami opartymi o uda, połóż się odbijając je kolanami do góry.',
+  'Ściągnij łopatki, hantle trzymaj nad klatką, dłonie zwrócone do przodu.',
+  'Opuszczaj do linii klatki, aż poczujesz rozciąganie — łokcie lekko pod kątem.',
+  'Wyciskaj w górę, prowadząc hantle lekko do siebie, ale bez stukania nimi o siebie.'],
+ ['Zbyt głębokie opuszczanie na siłę — bark nie lubi skrajnego rozciągnięcia pod ciężarem.',
+  'Prostowanie łokci na blokadę i odpoczywanie w górze.'],
+ 'Hantle dają większy zakres ruchu niż sztanga i wyrównują różnice między stronami.'],
+
+['Wyciskanie hantli na ławce skośnej','klatka',['barki','triceps'],'Hantle',2,
+ ['Ustaw oparcie ławki na 30–45 stopni. Wyżej to już głównie barki.',
+  'Ściągnij łopatki, hantle nad górną częścią klatki.',
+  'Opuszczaj do okolic obojczyków, kontrolując tempo.',
+  'Wyciskaj w górę bez pełnego blokowania łokci.'],
+ ['Za duży kąt oparcia — ćwiczenie zamienia się w wyciskanie na barki.',
+  'Wypychanie bioder do góry, żeby pomóc sobie ciężarem.'],
+ 'Górna część klatki zwykle zostaje w tyle — warto ją robić na początku treningu.'],
+
+['Rozpiętki z hantlami','klatka',[],'Hantle',2,
+ ['Połóż się na ławce, hantle wyprostowane nad klatką, dłonie zwrócone do siebie.',
+  'Ugnij lekko łokcie i utrzymuj ten kąt przez cały ruch — to nie jest wyciskanie.',
+  'Rozchylaj ramiona na boki po szerokim łuku, aż poczujesz rozciąganie klatki.',
+  'Zbliżaj hantle z powrotem tym samym łukiem, jakbyś obejmowała drzewo.'],
+ ['Prostowanie i uginanie łokci — zamienia rozpiętki w słabe wyciskanie.',
+  'Schodzenie za nisko z dużym ciężarem — to najczęstsza kontuzja barku w tym ćwiczeniu.'],
+ 'Rób je lekkim ciężarem na koniec treningu klatki, na czucie, nie na rekord.'],
+
+['Pompki','klatka',['triceps','barki','brzuch'],'Masa własna',1,
+ ['Podpór przodem, dłonie nieco szerzej niż barki, na wysokości klatki.',
+  'Napnij brzuch i pośladki — od głowy do pięt jedna linia.',
+  'Opuszczaj ciało, aż klatka będzie tuż nad podłogą, łokcie około 45 stopni od tułowia.',
+  'Wypchnij się w górę, nie zapadając w biodrach.'],
+ ['Opadające biodra i wypięty tyłek — znak, że brzuch nie pracuje.',
+  'Łokcie rozchylone na boki pod kątem prostym.',
+  'Skracanie zakresu — schodzenie tylko do połowy.'],
+ 'Za trudne? Zrób je z rękami na podwyższeniu, np. na ławce lub parapecie. Z kolan też jest ok.'],
+
+['Pompki z kolan','klatka',['triceps','barki'],'Masa własna',1,
+ ['Klęknij i oprzyj dłonie na podłodze nieco szerzej niż barki.',
+  'Przesuń kolana do tyłu tak, żeby od kolan do głowy była prosta linia.',
+  'Opuszczaj klatkę do podłogi, trzymając napięty brzuch.',
+  'Wypchnij się w górę.'],
+ ['Zginanie się w biodrach — wtedy ćwiczenie robi się dużo łatwiejsze i mało daje.',
+  'Podkładanie czegoś twardego pod kolana zamiast maty.'],
+ 'Dobry punkt startowy. Kiedy zrobisz 15 powtórzeń czysto, spróbuj pompek z podwyższenia.'],
+
+['Pompki na poręczach (dipy)','klatka',['triceps','barki'],'Masa własna',3,
+ ['Wejdź na poręcze z wyprostowanymi ramionami, ściągnij łopatki.',
+  'Pochyl tułów lekko do przodu — to przenosi pracę na klatkę.',
+  'Opuszczaj się, aż ramiona będą mniej więcej równolegle do podłogi.',
+  'Wypchnij się w górę bez bujania nogami.'],
+ ['Schodzenie za głęboko — mocno obciąża przednią część barku.',
+  'Rozbujanie ciała i wyrzucanie się siłą rozpędu.'],
+ 'Pionowy tułów przenosi pracę na triceps, pochylony na klatkę. Wybierz świadomie.'],
+
+['Wyciskanie na maszynie siedząc','klatka',['triceps','barki'],'Maszyna',1,
+ ['Ustaw siedzisko tak, żeby uchwyty były na wysokości środka klatki.',
+  'Oprzyj plecy o oparcie i ściągnij łopatki.',
+  'Wypchnij uchwyty do przodu, nie blokując łokci na końcu.',
+  'Wracaj powoli, aż poczujesz rozciąganie klatki.'],
+ ['Za wysokie siedzisko — ruch idzie wtedy w barki.',
+  'Odrywanie pleców od oparcia przy cięższych seriach.'],
+ 'Świetne na początek: maszyna prowadzi ruch, więc możesz skupić się na czuciu mięśnia.'],
+
+['Krzyżowanie linek wyciągu (brama)','klatka',[],'Wyciąg',2,
+ ['Ustaw bloczki wysoko, chwyć uchwyty i zrób krok do przodu, jedna noga wykroczna.',
+  'Pochyl lekko tułów, łokcie minimalnie ugięte.',
+  'Ściągaj ramiona po łuku w dół i do środka, aż dłonie się spotkają na wysokości brzucha.',
+  'Wracaj powoli, kontrolując rozciąganie.'],
+ ['Prostowanie i uginanie łokci zamiast ruchu w barkach.',
+  'Zbyt duży ciężar, przez który tułów szarpie do przodu.'],
+ 'Bloczki nisko — pracuje góra klatki. Wysoko — dół klatki.'],
+
+['Pullover z hantlem','klatka',['plecy'],'Hantle',2,
+ ['Połóż się wzdłuż ławki lub oprzyj o nią górę pleców w poprzek.',
+  'Chwyć jeden hantel obiema dłońmi za wewnętrzną stronę talerza, ramiona nad klatką.',
+  'Opuszczaj hantel za głowę po łuku, łokcie lekko ugięte, aż poczujesz rozciąganie klatki.',
+  'Przyciągnij z powrotem nad klatkę.'],
+ ['Zbyt głębokie schodzenie z ciężarem — bolesne dla barków.',
+  'Unoszenie bioder, żeby dołożyć zakresu.'],
+ 'Rób powoli i lekko. To ćwiczenie na rozciągnięcie, nie na ciężar.'],
+
+/* ---------------- PLECY ---------------- */
+['Podciąganie na drążku nachwytem','plecy',['biceps','barki'],'Masa własna',3,
+ ['Chwyć drążek nachwytem, nieco szerzej niż barki.',
+  'Zwis z lekko napiętymi łopatkami — nie wisz całkiem luźno.',
+  'Zacznij ruch od ściągnięcia łopatek w dół, dopiero potem ciągnij łokciami do dołu.',
+  'Podciągnij się, aż broda minie drążek, opuszczaj powoli do pełnego wyprostu.'],
+ ['Szarpanie nogami i bujanie — wtedy pracuje rozpęd, nie plecy.',
+  'Zaczynanie ruchu od zginania ramion zamiast od łopatek.'],
+ 'Za trudne? Użyj gumy pod kolana albo maszyny z asystą — to normalna droga, nie oszustwo.'],
+
+['Ściąganie drążka wyciągu górnego','plecy',['biceps'],'Wyciąg',1,
+ ['Ustaw wałki tak, żeby uda były dociśnięte i nie unosiły się.',
+  'Chwyć drążek szeroko nachwytem, wyprostuj ramiona.',
+  'Odchyl tułów minimalnie do tyłu i ściągaj drążek do górnej części klatki.',
+  'Prowadź łokcie w dół i do tyłu, na końcu ściśnij łopatki.',
+  'Wracaj powoli do pełnego wyprostu ramion.'],
+ ['Ściąganie drążka za głowę — niepotrzebne ryzyko dla barków i szyi.',
+  'Odchylanie się mocno do tyłu i ciągnięcie ciężaru całym ciałem.'],
+ 'Myśl o łokciach, nie o dłoniach. Dłonie to tylko haki.'],
+
+['Wiosłowanie sztangą w opadzie','plecy',['biceps','barki'],'Sztanga',2,
+ ['Stań w lekkim rozkroku, chwyć sztangę nachwytem na szerokość barków.',
+  'Ugnij kolana i pochyl tułów do około 45 stopni, plecy proste, klatka wypchnięta.',
+  'Przyciągaj sztangę do dolnej części brzucha, łokcie blisko tułowia.',
+  'Opuszczaj kontrolowanie, nie prostując pleców.'],
+ ['Zaokrąglone plecy — najszybsza droga do kontuzji w tym ćwiczeniu.',
+  'Prostowanie się do pionu przy każdym powtórzeniu.',
+  'Szarpanie ciężaru biodrami.'],
+ 'Zacznij od lekkiego ciężaru i nagraj się z boku. Pozycja pleców jest tu ważniejsza niż kilogramy.'],
+
+['Wiosłowanie hantlem w podporze','plecy',['biceps'],'Hantle',1,
+ ['Oprzyj kolano i dłoń jednej strony o ławkę, druga noga na podłodze.',
+  'Plecy równolegle do podłogi, proste. Hantel w wolnej ręce, ramię wyprostowane.',
+  'Przyciągaj hantel do biodra, prowadząc łokieć wzdłuż tułowia.',
+  'Opuszczaj powoli do pełnego rozciągnięcia.'],
+ ['Skręcanie tułowia, żeby wyciągnąć ciężar wyżej.',
+  'Ciągnięcie ręką zamiast plecami — łokieć odchodzi wtedy na bok.'],
+ 'Dobre na start, bo jedna ręka na ławce zdejmuje obciążenie z kręgosłupa.'],
+
+['Wiosłowanie na wyciągu siedząc','plecy',['biceps'],'Wyciąg',1,
+ ['Usiądź, oprzyj stopy, kolana lekko ugięte, chwyć uchwyt.',
+  'Wyprostuj plecy, klatka wypchnięta.',
+  'Przyciągaj uchwyt do brzucha, ściągając łopatki na końcu ruchu.',
+  'Wracaj powoli, pozwalając łopatkom się rozsunąć, ale bez garbienia.'],
+ ['Bujanie tułowiem w przód i w tył — to już nie plecy, tylko rozpęd.',
+  'Ciągnięcie do klatki zamiast do brzucha.'],
+ 'Zatrzymaj się na sekundę w ściągnięciu. Poczujesz różnicę.'],
+
+['Martwy ciąg klasyczny','plecy',['nogi','posladki','brzuch'],'Sztanga',3,
+ ['Stań tak, żeby gryf był nad środkiem stóp, stopy na szerokość bioder.',
+  'Zegnij biodra i kolana, chwyć gryf na szerokość barków.',
+  'Wypchnij klatkę, ściągnij łopatki, plecy proste — gryf dotyka goleni.',
+  'Odepchnij się nogami od podłogi, prowadząc sztangę tuż przy nogach.',
+  'Wyprostuj się całkowicie, ściskając pośladki. Opuszczaj tą samą drogą.'],
+ ['Zaokrąglone plecy — najpoważniejszy błąd, prowadzi do urazu kręgosłupa.',
+  'Odrywanie sztangi rękami zamiast napędu z nóg.',
+  'Odchylanie się mocno do tyłu na górze.'],
+ 'To ćwiczenie techniczne. Naucz się go z lekkim ciężarem albo pod okiem trenera, zanim dołożysz talerze.'],
+
+['Martwy ciąg rumuński','plecy',['posladki','nogi'],'Sztanga',2,
+ ['Stań ze sztangą w dłoniach, stopy na szerokość bioder, kolana lekko ugięte.',
+  'Ściągnij łopatki i utrzymuj proste plecy przez cały ruch.',
+  'Wypchnij biodra do tyłu i opuszczaj sztangę wzdłuż nóg, aż poczujesz rozciąganie z tyłu ud.',
+  'Wróć do góry, wypychając biodra do przodu i ściskając pośladki.'],
+ ['Kucanie zamiast wypychania bioder — to zamienia ćwiczenie w przysiad.',
+  'Odsuwanie sztangi od nóg, przez co obciąża się dolny odcinek pleców.'],
+ 'Zakres wyznacza rozciąganie dwugłowych, nie podłoga. Nie musisz schodzić do ziemi.'],
+
+['Przyciąganie liny do twarzy (face pull)','plecy',['barki'],'Wyciąg',1,
+ ['Ustaw bloczek na wysokości twarzy, chwyć linę oburącz od góry.',
+  'Zrób krok w tył, ramiona wyprostowane.',
+  'Przyciągaj linę do twarzy, rozchylając dłonie na boki i prowadząc łokcie wysoko.',
+  'Na końcu ściśnij łopatki, potem wracaj powoli.'],
+ ['Za duży ciężar i ciąganie całym ciałem.',
+  'Opuszczanie łokci w dół — wtedy pracują plecy zamiast tylnych barków.'],
+ 'Świetna przeciwwaga dla siedzenia przy biurku i wyciskań. Rób lekko, po 15–20 powtórzeń.'],
+
+['Szrugsy (wzruszanie ramion)','plecy',[],'Hantle',1,
+ ['Stań prosto z hantlami wzdłuż ciała, ramiona wyprostowane.',
+  'Unieś barki prosto do góry, jakbyś chciała dotknąć nimi uszu.',
+  'Zatrzymaj na chwilę w górze, opuść powoli.'],
+ ['Krążenie barkami — niepotrzebnie obciąża stawy.',
+  'Pomaganie sobie uginaniem ramion.'],
+ 'Ruch jest krótki. Nie oczekuj wielkiego zakresu, tylko mocnego napięcia u góry.'],
+
+['Hiperekstensja (prostowniki grzbietu)','plecy',['posladki'],'Maszyna',1,
+ ['Ustaw wałki tuż poniżej bioder, stopy zablokowane.',
+  'Skrzyżuj ręce na klatce, plecy proste.',
+  'Opuszczaj tułów, zginając się w biodrach, aż poczujesz rozciąganie z tyłu ud.',
+  'Wróć do linii ciała — nie wyżej.'],
+ ['Przeprost na górze, czyli wyginanie się do tyłu w plecach.',
+  'Zaokrąglanie pleców przy schodzeniu w dół.'],
+ 'Kończ ruch, gdy tułów jest w jednej linii z nogami. Wyżej to już tylko obciążanie kręgosłupa.'],
+
+/* ---------------- BARKI ---------------- */
+['Wyciskanie żołnierskie nad głowę','barki',['triceps','brzuch'],'Sztanga',2,
+ ['Stań w lekkim rozkroku, sztanga na wysokości obojczyków, chwyt nieco szerszy niż barki.',
+  'Napnij brzuch i pośladki — to chroni odcinek lędźwiowy.',
+  'Wypchnij sztangę pionowo nad głowę, odchylając lekko głowę z drogi.',
+  'Na górze schowaj głowę między ramiona. Opuszczaj kontrolowanie do obojczyków.'],
+ ['Odchylanie się mocno do tyłu — ćwiczenie zamienia się w wyciskanie skośne i przeciąża plecy.',
+  'Wypychanie sztangi po łuku do przodu.'],
+ 'Jeśli plecy się wyginają, ciężar jest za duży albo brzuch nie jest napięty.'],
+
+['Wyciskanie hantli nad głowę siedząc','barki',['triceps'],'Hantle',1,
+ ['Usiądź na ławce z oparciem, hantle na wysokości uszu, dłonie do przodu.',
+  'Napnij brzuch, plecy oparte.',
+  'Wyciskaj hantle w górę, aż ramiona są prawie wyprostowane.',
+  'Opuszczaj powoli do wysokości uszu.'],
+ ['Blokowanie łokci na górze i odpoczywanie.',
+  'Schodzenie za nisko, aż łokcie są znacznie poniżej barków.'],
+ 'Oparcie ławki zdejmuje pracę z kręgosłupa — dobra wersja na start.'],
+
+['Wznosy bokiem','barki',[],'Hantle',1,
+ ['Stań prosto z hantlami wzdłuż ciała, łokcie minimalnie ugięte.',
+  'Unoś ramiona na boki, aż będą na wysokości barków.',
+  'Prowadź ruch łokciami, nie dłońmi — łokcie zawsze wyżej niż nadgarstki.',
+  'Opuszczaj powoli, nie puszczając napięcia na dole.'],
+ ['Bujanie tułowiem i wyrzucanie ciężaru rozpędem.',
+  'Unoszenie ramion powyżej barków — wtedy przejmuje to czworoboczny.',
+  'Za ciężkie hantle, przez co ruch robi się szarpany.'],
+ 'To ćwiczenie na czucie, nie na ciężar. Lekkie hantle i 12–20 powtórzeń działają najlepiej.'],
+
+['Wznosy bokiem w opadzie','barki',['plecy'],'Hantle',2,
+ ['Pochyl tułów do przodu, prawie równolegle do podłogi, plecy proste.',
+  'Hantle pod klatką, łokcie lekko ugięte.',
+  'Rozchylaj ramiona na boki, ściskając tylne barki.',
+  'Opuszczaj powoli.'],
+ ['Prostowanie tułowia w trakcie serii.',
+  'Ściąganie łopatek zamiast pracy barkami — wtedy robisz ćwiczenie na plecy.'],
+ 'Tylny akton barku zwykle jest zaniedbany, a poprawia sylwetkę i postawę.'],
+
+['Arnoldki','barki',['triceps'],'Hantle',2,
+ ['Usiądź, hantle przed klatką, dłonie zwrócone do siebie.',
+  'Wyciskając w górę, obracaj nadgarstki, aż na górze dłonie będą zwrócone do przodu.',
+  'Wracaj tą samą drogą, obracając dłonie z powrotem do siebie.'],
+ ['Zbyt szybkie tempo — obrót ma być płynny, nie szarpany.',
+  'Za ciężkie hantle, przez co obrót ginie.'],
+ 'Obrót angażuje przedni i boczny akton w jednym ruchu. Ciężar dobierz mniejszy niż do zwykłego wyciskania.'],
+
+['Podciąganie sztangi wzdłuż tułowia','barki',['plecy'],'Sztanga',2,
+ ['Chwyć sztangę nachwytem nieco węziej niż barki, ramiona wyprostowane.',
+  'Podciągaj sztangę blisko ciała, prowadząc łokcie wysoko na boki.',
+  'Zatrzymaj, gdy sztanga jest na wysokości klatki. Opuszczaj powoli.'],
+ ['Podciąganie zbyt wysoko i zbyt wąskim chwytem — nieprzyjemne dla barków.',
+  'Bujanie tułowiem.'],
+ 'Jeśli czujesz szczypanie w barku, zmniejsz zakres albo zamień na wznosy bokiem.'],
+
+['Wznosy przodem','barki',[],'Hantle',1,
+ ['Stań prosto, hantle przed udami, dłonie zwrócone do ciała.',
+  'Unoś jedno ramię przed siebie do wysokości barku, łokieć lekko ugięty.',
+  'Opuszczaj powoli i powtórz drugą ręką albo rób obiema naraz.'],
+ ['Bujanie biodrami, żeby zarzucić ciężar.',
+  'Unoszenie ramion znacznie powyżej barków.'],
+ 'Przedni akton pracuje już przy każdym wyciskaniu. Nie potrzebuje dużo dodatkowej objętości.'],
+
+['Odwrotne rozpiętki na maszynie','barki',['plecy'],'Maszyna',1,
+ ['Usiądź przodem do oparcia, klatka dociśnięta do poduszki.',
+  'Chwyć uchwyty, ramiona lekko ugięte.',
+  'Rozchylaj ramiona na boki, ściskając tylne barki i łopatki.',
+  'Wracaj powoli, nie puszczając ciężaru.'],
+ ['Odrywanie klatki od oparcia.',
+  'Prostowanie ramion na siłę na końcu ruchu.'],
+ 'Wygodna alternatywa dla wznosów w opadzie, jeśli boli Cię dolny odcinek pleców.'],
+
+/* ---------------- BICEPS ---------------- */
+['Uginanie ramion ze sztangą','biceps',['przedramiona'],'Sztanga',1,
+ ['Stań prosto, chwyć sztangę podchwytem na szerokość barków.',
+  'Łokcie przy tułowiu, ramiona wyprostowane.',
+  'Uginaj ramiona, unosząc sztangę do klatki — łokcie zostają w miejscu.',
+  'Opuszczaj powoli do pełnego wyprostu.'],
+ ['Bujanie tułowiem i zarzucanie ciężaru biodrami.',
+  'Wysuwanie łokci do przodu — wtedy pracę przejmują barki.',
+  'Zatrzymywanie się w połowie drogi w dół.'],
+ 'Stań plecami do ściany. Jeśli musisz się bujać, żeby unieść ciężar, jest za duży.'],
+
+['Uginanie ramion z hantlami','biceps',['przedramiona'],'Hantle',1,
+ ['Stań lub usiądź z hantlami wzdłuż ciała, dłonie zwrócone do siebie.',
+  'Uginaj ramię, obracając nadgarstek tak, żeby na górze dłoń była zwrócona do góry.',
+  'Ściśnij biceps na szczycie, opuszczaj powoli z powrotem.'],
+ ['Unoszenie barku razem z ciężarem.',
+  'Pomijanie obrotu nadgarstka, który dodatkowo angażuje biceps.'],
+ 'Możesz robić naprzemiennie — łatwiej wtedy utrzymać technikę.'],
+
+['Uginanie młotkowe','biceps',['przedramiona'],'Hantle',1,
+ ['Stań prosto, hantle wzdłuż ciała, dłonie zwrócone do siebie przez cały ruch.',
+  'Uginaj ramiona, trzymając łokcie przy tułowiu.',
+  'Opuszczaj powoli, nie obracając nadgarstków.'],
+ ['Bujanie się, żeby zarzucić ciężar.',
+  'Rozchylanie łokci na boki.'],
+ 'Mocniej angażuje ramienno-promieniowy, przez co ramię wygląda pełniej z boku.'],
+
+['Uginanie na modlitewniku','biceps',[],'Sztanga',2,
+ ['Usiądź i oprzyj tylną część ramion płasko o pulpit.',
+  'Chwyć sztangę łamaną podchwytem, ramiona prawie wyprostowane.',
+  'Uginaj ramiona do góry, nie odrywając ramion od pulpitu.',
+  'Opuszczaj bardzo powoli, kontrolując pełen wyprost.'],
+ ['Gwałtowne prostowanie ramion na dole — najczęstsza przyczyna naciągnięcia bicepsa.',
+  'Odrywanie łokci od pulpitu.'],
+ 'Pozycja odcina wszelkie oszukiwanie. Ciężar dobierz wyraźnie mniejszy niż do zwykłego uginania.'],
+
+['Uginanie na wyciągu dolnym','biceps',[],'Wyciąg',1,
+ ['Stań przodem do wyciągu, chwyć drążek podchwytem.',
+  'Łokcie przy tułowiu, ramiona wyprostowane.',
+  'Uginaj ramiona do klatki, opuszczaj powoli.'],
+ ['Odchylanie się do tyłu, żeby pomóc sobie ciężarem.',
+  'Odsuwanie się od wyciągu, co zmienia tor ruchu.'],
+ 'Wyciąg trzyma napięcie na mięśniu również na dole, czego hantle nie robią.'],
+
+['Uginanie ramion na ławce skośnej','biceps',[],'Hantle',2,
+ ['Ustaw ławkę na około 45–60 stopni i usiądź, opierając plecy.',
+  'Pozwól ramionom zwisać swobodnie za linią tułowia.',
+  'Uginaj ramiona, nie wysuwając łokci do przodu.',
+  'Opuszczaj powoli do pełnego rozciągnięcia.'],
+ ['Wysuwanie łokci do przodu, co skraca rozciągnięcie.',
+  'Odrywanie pleców od oparcia.'],
+ 'Największe rozciągnięcie bicepsa ze wszystkich uginań. Zacznij od naprawdę lekkich hantli.'],
+
+/* ---------------- TRICEPS ---------------- */
+['Prostowanie ramion na wyciągu górnym','triceps',[],'Wyciąg',1,
+ ['Stań przodem do wyciągu, chwyć drążek nachwytem na szerokość barków.',
+  'Łokcie przy tułowiu, przedramiona równolegle do podłogi.',
+  'Prostuj ramiona w dół, nie ruszając łokciami.',
+  'Wracaj powoli do kąta prostego w łokciu.'],
+ ['Wysuwanie łokci do przodu i pomaganie sobie barkami.',
+  'Pochylanie tułowia i dociskanie ciężaru masą ciała.'],
+ 'Łokcie przyklejone do boków to całe sedno tego ćwiczenia.'],
+
+['Francuskie wyciskanie','triceps',[],'Sztanga',2,
+ ['Połóż się na ławce, sztanga łamana nad klatką, ramiona wyprostowane.',
+  'Zginając tylko łokcie, opuszczaj sztangę w stronę czoła lub za głowę.',
+  'Ramiona pozostają nieruchome, skierowane pionowo lub lekko do tyłu.',
+  'Wyprostuj ramiona z powrotem.'],
+ ['Ruszanie ramionami — wtedy ćwiczenie zamienia się w wyciskanie.',
+  'Zbyt duży ciężar, przez który łokcie się rozchylają.'],
+ 'Jeśli czujesz ból w łokciach, zamień na wersję z wyciągiem albo hantlami.'],
+
+['Pompki w podporze tyłem','triceps',['barki'],'Masa własna',1,
+ ['Usiądź na ławce, chwyć jej krawędź po bokach bioder.',
+  'Zsuń biodra z ławki, nogi ugięte lub wyprostowane przed sobą.',
+  'Opuszczaj ciało, zginając łokcie do około 90 stopni — łokcie idą do tyłu, nie na boki.',
+  'Wypchnij się w górę.'],
+ ['Schodzenie zbyt nisko — mocno obciąża przód barku.',
+  'Rozchylanie łokci na boki.',
+  'Odsuwanie bioder od ławki.'],
+ 'Nogi ugięte to wersja łatwiejsza, wyprostowane trudniejsza. Wybierz według siły.'],
+
+['Wyciskanie sztangi wąsko','triceps',['klatka','barki'],'Sztanga',2,
+ ['Połóż się na ławce, chwyć gryf na szerokość barków — nie węziej.',
+  'Ściągnij łopatki, opuszczaj sztangę do dolnej części klatki.',
+  'Trzymaj łokcie blisko tułowia przez cały ruch.',
+  'Wyciskaj w górę, kończąc mocnym napięciem tricepsa.'],
+ ['Chwyt węższy niż szerokość barków — nadwyręża nadgarstki.',
+  'Rozchylanie łokci, przez co pracę przejmuje klatka.'],
+ 'To najcięższe ćwiczenie na triceps. Dobre na początek treningu ramion.'],
+
+['Wyprost ramienia w opadzie','triceps',[],'Hantle',1,
+ ['Oprzyj kolano i dłoń o ławkę, tułów równolegle do podłogi.',
+  'Przyciągnij łokieć wolnej ręki do tułowia, ramię równolegle do podłogi.',
+  'Prostuj ramię do tyłu, nie ruszając łokciem.',
+  'Wracaj powoli.'],
+ ['Opuszczanie łokcia w trakcie serii.',
+  'Machanie ramieniem zamiast kontrolowanego prostowania.'],
+ 'Małe ćwiczenie wykończeniowe. Lekki hantel i dużo powtórzeń.'],
+
+['Prostowanie ramion zza głowy na wyciągu','triceps',[],'Wyciąg',1,
+ ['Stań tyłem do wyciągu, chwyć linę i unieś ją za głowę.',
+  'Zrób krok do przodu, łokcie skierowane do góry i do przodu.',
+  'Prostuj ramiona nad głowę, nie ruszając łokciami.',
+  'Wracaj powoli do pełnego rozciągnięcia tricepsa.'],
+ ['Rozchylanie łokci na boki.',
+  'Pochylanie się coraz bardziej w trakcie serii.'],
+ 'Pozycja nad głową rozciąga długą głowę tricepsa, której nie ruszysz prostowaniem w dół.'],
+
+/* ---------------- NOGI ---------------- */
+['Przysiad ze sztangą','nogi',['posladki','brzuch'],'Sztanga',3,
+ ['Ustaw sztangę na stojakach na wysokości środka klatki. Oprzyj ją na górnej części pleców, nie na szyi.',
+  'Wyjdź ze stojaka, stopy na szerokość barków, palce lekko na zewnątrz.',
+  'Napnij brzuch, wypchnij klatkę i zacznij ruch od odsunięcia bioder do tyłu.',
+  'Schodź w dół, aż uda będą co najmniej równolegle do podłogi. Kolana w linii stóp.',
+  'Wstań, napierając całą stopą, nie odrywając pięt.'],
+ ['Zapadanie kolan do środka przy wstawaniu.',
+  'Odrywanie pięt od podłogi.',
+  'Zaokrąglanie dolnego odcinka pleców na dole.'],
+ 'Naucz się ruchu z samym gryfem albo bez ciężaru. To ćwiczenie wybacza najmniej ze wszystkich.'],
+
+['Przysiad goblet','nogi',['posladki','brzuch'],'Hantle',1,
+ ['Chwyć hantel lub kettlebell pionowo przy klatce, oburącz.',
+  'Stopy nieco szerzej niż barki, palce lekko na zewnątrz.',
+  'Schodź w dół, trzymając tułów wyprostowany, łokcie między kolanami.',
+  'Zejdź tak nisko, jak pozwala prosty kręgosłup, i wstań, napierając piętami.'],
+ ['Pochylanie się do przodu — ciężar przy klatce ma temu zapobiegać.',
+  'Odrywanie pięt.'],
+ 'Najlepszy sposób, żeby nauczyć się przysiadu. Ciężar z przodu sam ustawia sylwetkę.'],
+
+['Wykroki','nogi',['posladki'],'Hantle',2,
+ ['Stań prosto z hantlami wzdłuż ciała.',
+  'Zrób duży krok do przodu i opuść biodra, aż oba kolana będą pod kątem prostym.',
+  'Tylne kolano tuż nad podłogą, tułów wyprostowany.',
+  'Odepchnij się przednią nogą i wróć do pozycji stojącej.'],
+ ['Za krótki krok, przez co przednie kolano wychodzi mocno przed palce.',
+  'Pochylanie tułowia do przodu.',
+  'Uderzanie tylnym kolanem o podłogę.'],
+ 'Wersja w miejscu jest łatwiejsza do opanowania niż chodzone. Zacznij bez ciężaru.'],
+
+['Wypychanie ciężaru na suwnicy','nogi',['posladki'],'Maszyna',1,
+ ['Usiądź, oprzyj plecy i biodra o oparcie, stopy na platformie na szerokość bioder.',
+  'Zwolnij zabezpieczenia i opuszczaj ciężar, aż kolana będą pod kątem około 90 stopni.',
+  'Wypchnij platformę nogami, nie blokując kolan na końcu.'],
+ ['Odrywanie bioder od oparcia przy głębokim zejściu — bardzo obciąża kręgosłup.',
+  'Blokowanie kolan na wyproście.',
+  'Pomaganie sobie rękami pchającymi kolana.'],
+ 'Wyżej postawione stopy mocniej angażują pośladki i tył uda, niżej przód uda.'],
+
+['Prostowanie nóg na maszynie','nogi',[],'Maszyna',1,
+ ['Usiądź, oprzyj plecy, ustaw wałek tuż nad kostkami.',
+  'Chwyć uchwyty po bokach siedziska.',
+  'Prostuj nogi do pełnego wyprostu, zatrzymaj na chwilę.',
+  'Opuszczaj powoli, nie odkładając ciężaru na stos.'],
+ ['Szarpanie ciężaru i opuszczanie go swobodnie.',
+  'Odrywanie pośladków od siedziska.'],
+ 'Ćwiczenie izolowane. Dobre jako rozgrzewka kolan przed przysiadami lub dobicie na koniec.'],
+
+['Uginanie nóg leżąc na maszynie','nogi',['posladki'],'Maszyna',1,
+ ['Połóż się na brzuchu, wałek tuż nad ścięgnami Achillesa.',
+  'Chwyć uchwyty, biodra dociśnięte do leżanki.',
+  'Uginaj nogi, przyciągając wałek do pośladków.',
+  'Opuszczaj powoli do prawie pełnego wyprostu.'],
+ ['Unoszenie bioder, żeby dołożyć zakresu.',
+  'Gwałtowne opuszczanie ciężaru.'],
+ 'Tył uda bywa zaniedbany, a to on chroni kolano przy bieganiu i przysiadach.'],
+
+['Przysiad bułgarski','nogi',['posladki'],'Hantle',3,
+ ['Stań tyłem do ławki, oprzyj na niej grzbiet tylnej stopy.',
+  'Przednia noga wysunięta na tyle, żeby kolano nie wychodziło daleko przed palce.',
+  'Opuszczaj biodra w dół, aż przednie udo będzie równolegle do podłogi.',
+  'Wstań, napierając piętą przedniej nogi.'],
+ ['Za bliskie ustawienie przedniej stopy.',
+  'Przenoszenie ciężaru na tylną nogę.',
+  'Utrata równowagi przez zbyt szybkie tempo.'],
+ 'Najpierw opanuj wersję bez ciężaru, trzymając się czegoś dla równowagi. Mocno angażuje pośladek.'],
+
+['Przysiad przodem (front squat)','nogi',['brzuch','posladki'],'Sztanga',3,
+ ['Oprzyj sztangę na przednich mięśniach naramiennych, łokcie wysoko.',
+  'Stopy na szerokość barków, tułów pionowo.',
+  'Schodź w dół, trzymając łokcie uniesione — opuszczenie ich zrzuca sztangę.',
+  'Wstań, napierając całymi stopami.'],
+ ['Opuszczanie łokci w trakcie ruchu.',
+  'Pochylanie tułowia do przodu.'],
+ 'Mocniej obciąża przód uda i wymusza pionową sylwetkę. Wymaga ruchomości nadgarstków.'],
+
+['Wchodzenie na skrzynię','nogi',['posladki'],'Hantle',2,
+ ['Stań przed skrzynią lub ławką o wysokości mniej więcej kolana, hantle wzdłuż ciała.',
+  'Postaw całą stopę na skrzyni.',
+  'Wejdź, prostując nogę stojącą na skrzyni — nie odbijaj się dolną nogą.',
+  'Zejdź kontrolowanie tą samą nogą.'],
+ ['Odbijanie się nogą stojącą na podłodze.',
+  'Zeskakiwanie zamiast schodzenia.'],
+ 'Świetne dla pośladków i równowagi. Wysokość skrzyni reguluje trudność.'],
+
+['Przysiad sumo','nogi',['posladki'],'Hantle',2,
+ ['Stań w szerokim rozkroku, palce stóp wyraźnie na zewnątrz.',
+  'Trzymaj hantel oburącz między nogami lub sztangę na plecach.',
+  'Schodź w dół, prowadząc kolana w linii palców, tułów wyprostowany.',
+  'Wstań, ściskając pośladki i wewnętrzną stronę ud.'],
+ ['Zapadanie kolan do środka.',
+  'Zbyt wąskie ustawienie jak na ten wariant.'],
+ 'Szeroki rozkrok mocniej angażuje przywodziciele i pośladki niż klasyczny przysiad.'],
+
+/* ---------------- POŚLADKI ---------------- */
+['Hip thrust (wypychanie bioder)','posladki',['nogi'],'Sztanga',2,
+ ['Oprzyj górną część pleców o ławkę, sztanga na biodrach na macie lub podkładce.',
+  'Stopy płasko, na szerokość bioder, pięty pod kolanami.',
+  'Wypchnij biodra do góry, aż tułów i uda będą w jednej linii.',
+  'Ściśnij mocno pośladki na górze, opuszczaj powoli.'],
+ ['Przeprost w plecach zamiast pełnego ściśnięcia pośladków.',
+  'Za daleko wysunięte stopy — wtedy pracuje tył uda.',
+  'Odrywanie pięt od podłogi.'],
+ 'Najskuteczniejsze ćwiczenie na pośladki. Podbródek trzymaj lekko schowany, wzrok do przodu.'],
+
+['Mostek biodrowy','posladki',['nogi'],'Masa własna',1,
+ ['Połóż się na plecach, kolana ugięte, stopy płasko blisko pośladków.',
+  'Napnij brzuch i wypchnij biodra do góry.',
+  'Ściśnij pośladki na szczycie, zatrzymaj na sekundę.',
+  'Opuszczaj powoli, nie kładąc bioder całkiem na podłodze.'],
+ ['Wyginanie się w plecach zamiast pracy pośladkami.',
+  'Odpychanie się palcami stóp zamiast piętami.'],
+ 'Wersja bez sprzętu, do zrobienia w domu. Możesz utrudnić, robiąc na jednej nodze.'],
+
+['Odwodzenie nogi na wyciągu','posladki',[],'Wyciąg',1,
+ ['Przypnij rzep do kostki, stań bokiem do wyciągu, trzymając się konstrukcji.',
+  'Przenieś ciężar ciała na nogę bliższą maszynie.',
+  'Odwodź wolną nogę na bok, nie przechylając tułowia.',
+  'Wracaj powoli, nie opuszczając ciężaru na stos.'],
+ ['Przechylanie tułowia w przeciwną stronę, żeby zwiększyć zakres.',
+  'Za duży ciężar i szarpanie nogą.'],
+ 'Zakres jest krótki. Skup się na napięciu w górnej części pośladka.'],
+
+['Odwodzenie nóg na maszynie','posladki',[],'Maszyna',1,
+ ['Usiądź, oprzyj plecy, ustaw poduszki po zewnętrznej stronie kolan.',
+  'Rozchylaj kolana na zewnątrz do pełnego zakresu.',
+  'Zatrzymaj na chwilę, wracaj powoli.'],
+ ['Odrywanie pleców od oparcia i pomaganie sobie tułowiem.',
+  'Puszczanie ciężaru swobodnie w drodze powrotnej.'],
+ 'Lekkie pochylenie tułowia do przodu mocniej angażuje górną część pośladka.'],
+
+['Martwy ciąg rumuński z hantlami','posladki',['nogi','plecy'],'Hantle',2,
+ ['Stań prosto z hantlami przed udami, kolana lekko ugięte.',
+  'Wypchnij biodra do tyłu, opuszczając hantle wzdłuż nóg.',
+  'Schodź, aż poczujesz rozciąganie z tyłu ud, plecy cały czas proste.',
+  'Wróć, wypychając biodra do przodu i ściskając pośladki.'],
+ ['Zaokrąglanie pleców.',
+  'Kucanie zamiast odsuwania bioder do tyłu.'],
+ 'Wersja z hantlami jest łatwiejsza do opanowania niż ze sztangą.'],
+
+['Wyprost nogi w tył na wyciągu','posladki',[],'Wyciąg',1,
+ ['Przypnij rzep do kostki, stań przodem do wyciągu, chwyć konstrukcję.',
+  'Pochyl lekko tułów, napnij brzuch.',
+  'Odwodź nogę do tyłu, prostując biodro i ściskając pośladek.',
+  'Wracaj powoli, nie odkładając ciężaru.'],
+ ['Wyginanie się w plecach, żeby wyrzucić nogę wyżej.',
+  'Zginanie kolana i machanie łydką.'],
+ 'Ruch wychodzi z biodra. Noga może być lekko ugięta, ale kąt w kolanie ma się nie zmieniać.'],
+
+['Zakroki','posladki',['nogi'],'Hantle',2,
+ ['Stań prosto z hantlami wzdłuż ciała.',
+  'Zrób duży krok do tyłu i opuść biodra, aż oba kolana będą zgięte do kąta prostego.',
+  'Tułów wyprostowany, ciężar na przedniej nodze.',
+  'Odepchnij się przednią nogą i wróć do stania.'],
+ ['Za krótki krok do tyłu.',
+  'Przenoszenie ciężaru na tylną nogę.'],
+ 'Łatwiejsze dla kolan niż wykroki do przodu i mocniej angażują pośladek.'],
+
+/* ---------------- BRZUCH ---------------- */
+['Deska (plank)','brzuch',['barki','posladki'],'Masa własna',1,
+ ['Oprzyj się na przedramionach i palcach stóp, łokcie pod barkami.',
+  'Napnij brzuch i pośladki, podwiń lekko miednicę.',
+  'Utrzymuj prostą linię od głowy do pięt.',
+  'Oddychaj spokojnie, nie wstrzymuj oddechu.'],
+ ['Opadające biodra — najczęstszy błąd, obciąża lędźwie.',
+  'Wypięty tyłek do góry, co odciąża brzuch.',
+  'Zadzieranie głowy.'],
+ 'Lepsze 20 sekund w idealnej pozycji niż 2 minuty z opadającymi biodrami.'],
+
+['Deska bokiem','brzuch',['barki'],'Masa własna',2,
+ ['Połóż się na boku, oprzyj na przedramieniu, łokieć pod barkiem.',
+  'Unieś biodra, tworząc prostą linię od głowy do stóp.',
+  'Druga ręka na biodrze lub wyciągnięta do góry.',
+  'Utrzymaj pozycję, potem zmień stronę.'],
+ ['Opadające biodra.',
+  'Przekręcanie tułowia do przodu lub do tyłu.'],
+ 'Za trudne? Oprzyj się na kolanach zamiast na stopach.'],
+
+['Spięcia brzucha (crunch)','brzuch',[],'Masa własna',1,
+ ['Połóż się na plecach, kolana ugięte, stopy płasko na podłodze.',
+  'Ręce skrzyżowane na klatce lub delikatnie przy skroniach.',
+  'Unieś łopatki nad podłogę, zwijając górę tułowia — lędźwie zostają na macie.',
+  'Opuszczaj powoli, nie kładąc głowy do końca.'],
+ ['Ciągnięcie głowy rękami za kark.',
+  'Unoszenie całego tułowia zamiast zwijania górnej części.',
+  'Zbyt szybkie tempo i praca rozpędem.'],
+ 'Ruch jest krótki. Jeśli unosisz się wysoko, pracują już zginacze bioder, nie brzuch.'],
+
+['Unoszenie nóg w zwisie','brzuch',['przedramiona'],'Masa własna',3,
+ ['Zwis na drążku, ramiona wyprostowane, ciało nieruchome.',
+  'Napnij brzuch i podwiń miednicę.',
+  'Unoś kolana lub proste nogi do wysokości bioder albo wyżej.',
+  'Opuszczaj powoli, nie rozbujając ciała.'],
+ ['Bujanie się, przez co pracuje rozpęd.',
+  'Unoszenie samych nóg bez podwinięcia miednicy — wtedy pracują zginacze bioder.'],
+ 'Zacznij od podciągania kolan. Proste nogi to wersja dużo trudniejsza.'],
+
+['Rosyjski skręt','brzuch',[],'Hantle',2,
+ ['Usiądź, kolana ugięte, odchyl tułów do około 45 stopni.',
+  'Trzymaj hantel lub talerz oburącz przed klatką.',
+  'Skręcaj tułów na boki, przenosząc ciężar za linię biodra.',
+  'Ruch prowadzi tułów, nie same ręce.'],
+ ['Machanie rękami przy nieruchomym tułowiu.',
+  'Zaokrąglanie pleców.',
+  'Zbyt szybkie tempo.'],
+ 'Stopy oderwane od podłogi utrudniają ćwiczenie. Na start zostaw je na ziemi.'],
+
+['Dead bug','brzuch',[],'Masa własna',1,
+ ['Połóż się na plecach, ramiona wyprostowane nad barkami, nogi ugięte pod kątem prostym.',
+  'Dociśnij dolny odcinek pleców do podłogi i utrzymuj go tam przez cały czas.',
+  'Opuszczaj jednocześnie przeciwną rękę i nogę w stronę podłogi.',
+  'Wróć do pozycji wyjściowej i zmień stronę.'],
+ ['Odrywanie lędźwi od podłogi — to znak, że zakres jest za duży.',
+  'Wstrzymywanie oddechu.'],
+ 'Wygląda łatwo, a uczy najważniejszej rzeczy: stabilizacji kręgosłupa. Bezpieczne dla pleców.'],
+
+['Spięcia na wyciągu górnym','brzuch',[],'Wyciąg',2,
+ ['Uklęknij przodem do wyciągu, chwyć linę i przyłóż dłonie przy skroniach.',
+  'Biodra nieruchome, tułów lekko pochylony.',
+  'Zwijaj tułów w dół, przybliżając żebra do bioder.',
+  'Wracaj powoli, kontrolując ciężar.'],
+ ['Zginanie się w biodrach zamiast zwijania tułowia.',
+  'Ciągnięcie liny rękami.'],
+ 'Wyobraź sobie, że zwijasz się jak gąsienica. Biodra zostają w miejscu.'],
+
+['Rower','brzuch',[],'Masa własna',1,
+ ['Połóż się na plecach, dłonie przy skroniach, nogi uniesione i ugięte.',
+  'Unieś łopatki nad podłogę.',
+  'Przyciągaj kolano do przeciwnego łokcia, prostując drugą nogę.',
+  'Zmieniaj strony płynnie, kontrolując tempo.'],
+ ['Ciągnięcie głowy rękami.',
+  'Bardzo szybkie tempo bez faktycznego skrętu tułowia.'],
+ 'Wolniej znaczy trudniej. Nie chodzi o liczbę powtórzeń, tylko o napięcie.'],
+
+/* ---------------- ŁYDKI ---------------- */
+['Wspięcia na palce stojąc','lydki',[],'Maszyna',1,
+ ['Stań na podwyższeniu lub w maszynie, śródstopie na krawędzi, pięty w powietrzu.',
+  'Opuść pięty jak najniżej, aż poczujesz rozciąganie.',
+  'Wspinaj się maksymalnie wysoko na palce.',
+  'Zatrzymaj na górze, opuszczaj powoli.'],
+ ['Sprężynowanie i praca rozpędem.',
+  'Skracanie zakresu w dół.'],
+ 'Łydki lubią pełny zakres i dużo powtórzeń. 15–25 w serii to dobry punkt wyjścia.'],
+
+['Wspięcia na palce siedząc','lydki',[],'Maszyna',1,
+ ['Usiądź, wałki na dolnej części ud, śródstopie na platformie.',
+  'Opuść pięty najniżej jak możesz.',
+  'Wspinaj się na palce, ściskając łydkę na górze.',
+  'Opuszczaj powoli.'],
+ ['Podbijanie ciężaru rękami opartymi o wałki.',
+  'Częściowy zakres ruchu.'],
+ 'Zgięte kolano przenosi pracę na mięsień płaszczkowaty — głębiej położony, ale ważny dla obwodu łydki.'],
+
+['Wspięcia na palce na suwnicy','lydki',[],'Maszyna',2,
+ ['Usiądź w suwnicy, oprzyj śródstopie na dole platformy, pięty w powietrzu.',
+  'Zwolnij zabezpieczenia, nogi prawie wyprostowane, ale kolana nie zablokowane.',
+  'Opuszczaj pięty do pełnego rozciągnięcia, potem wypchnij palcami.'],
+ ['Blokowanie kolan pod dużym ciężarem.',
+  'Ustawienie stóp za wysoko na platformie.'],
+ 'Zabezpieczenia zostaw zamknięte, jeśli ćwiczysz sama — stopa może się ześlizgnąć.'],
+
+/* ---------------- CARDIO ---------------- */
+['Marsz po bieżni pod górę','cardio',['nogi','posladki'],'Maszyna',1,
+ ['Ustaw nachylenie na 8–15 procent i prędkość marszu, przy której możesz jeszcze mówić.',
+  'Idź wyprostowana, nie trzymając się poręczy.',
+  'Stawiaj całą stopę, nie tylko palce.',
+  'Utrzymuj tempo przez 20–45 minut.'],
+ ['Trzymanie się poręczy — zmniejsza wysiłek nawet o jedną trzecią.',
+  'Za duża prędkość przy dużym nachyleniu, przez co przechodzisz w bieg.'],
+ 'Niskie tętno, mało obciążone stawy, dobrze się łączy z treningiem siłowym.'],
+
+['Orbitrek','cardio',['nogi'],'Maszyna',1,
+ ['Stań na platformach, chwyć ruchome uchwyty.',
+  'Prowadź ruch nogami, pomagając sobie ramionami.',
+  'Utrzymuj wyprostowaną sylwetkę, nie opieraj się na uchwytach.',
+  'Trzymaj równe tempo przez 20–40 minut.'],
+ ['Zawieszanie ciężaru ciała na rękach.',
+  'Zbyt mały opór i bardzo szybkie, bezwładne tempo.'],
+ 'Praktycznie nie obciąża kolan. Dobry wybór, jeśli bieganie sprawia ból.'],
+
+['Rower stacjonarny','cardio',['nogi'],'Maszyna',1,
+ ['Ustaw siodełko tak, żeby przy najniższej pozycji pedału noga była prawie wyprostowana.',
+  'Trzymaj plecy w naturalnej pozycji, nie garb się nad kierownicą.',
+  'Pedałuj równym tempem, opór dobierz tak, żeby dało się utrzymać rytm.'],
+ ['Za nisko ustawione siodełko — najczęstsza przyczyna bólu kolan.',
+  'Bujanie biodrami na boki przy dużym oporze.'],
+ 'Wysokość siodełka sprawdź przed pierwszą minutą, nie po dziesiątej.'],
+
+['Wioślarz','cardio',['plecy','nogi','brzuch'],'Maszyna',2,
+ ['Zapnij stopy, chwyć uchwyt, kolana ugięte, tułów lekko pochylony do przodu.',
+  'Zacznij od odepchnięcia nogami, dopiero potem odchyl tułów i przyciągnij uchwyt do żeber.',
+  'Wracaj w odwrotnej kolejności: ramiona, tułów, nogi.',
+  'Utrzymuj płynny rytm.'],
+ ['Ciągnięcie ramionami przed odepchnięciem nogami.',
+  'Zaokrąglone plecy przy powrocie.'],
+ 'Kolejność to nogi, tułów, ramiona. Odwrotnie przy powrocie. To cała technika.'],
+
+['Skakanka','cardio',['lydki'],'Masa własna',2,
+ ['Dobierz długość: stojąc na środku linki, uchwyty powinny sięgać mniej więcej pach.',
+  'Łokcie przy tułowiu, obracaj linkę nadgarstkami, nie całymi ramionami.',
+  'Skacz nisko, lądując miękko na śródstopiu.',
+  'Zacznij od interwałów, np. 30 sekund skakania i 30 przerwy.'],
+ ['Za wysokie skoki, które szybko męczą łydki.',
+  'Kręcenie całymi ramionami.'],
+ 'Bardzo obciąża łydki i stopy na początku. Zwiększaj objętość stopniowo.'],
+
+['Interwały (HIIT)','cardio',['nogi'],'Maszyna',3,
+ ['Rozgrzej się spokojnym tempem przez 5 minut.',
+  'Wykonaj 20–40 sekund pracy na wysokiej intensywności.',
+  'Następnie 60–120 sekund spokojnego tempa na regenerację.',
+  'Powtórz 6–10 razy, zakończ 5 minutami wyciszenia.'],
+ ['Zaczynanie od interwałów bez rozgrzewki.',
+  'Zbyt krótkie przerwy, przez które kolejne odcinki są coraz słabsze.',
+  'Robienie tego codziennie — to mocno obciąża układ nerwowy.'],
+ 'Maksymalnie 2 razy w tygodniu i nie w dniu ciężkich nóg. Reszta cardio spokojnym tempem.']
+];
+
+/* ============================================================
+   Widok: Atlas ćwiczeń
+   ============================================================ */
+function exObj(a){ return {n:a[0], g:a[1], sec:a[2]||[], eq:a[3], lvl:a[4], how:a[5], err:a[6], tip:a[7]} }
+const EXL = EX.map(exObj);
+function grpName(k){ const g=EXG.find(x=>x[0]===k); return g?g[1]:k }
+function isFav(n){ return (S.favEx||[]).includes(n) }
+function toggleFav(n){
+  if(!Array.isArray(S.favEx)) S.favEx=[];
+  S.favEx = isFav(n) ? S.favEx.filter(x=>x!==n) : [...S.favEx, n];
+  save();
+}
+function renderExFilters(){
+  const f=$('#exFilters'); if(!f) return;
+  f.innerHTML='';
+  const opts=[['all','Wszystko'],['fav','★ Ulubione'],...EXG];
+  for(const [v,lab] of opts){
+    const b=el('button','fbtn'+(exFilter===v?' on':''),lab);
+    b.onclick=()=>{exFilter=v; renderExFilters(); renderAtlas()};
+    f.appendChild(b);
+  }
+}
+function searchEx(){
+  const words=norm(exQuery).trim().split(/\s+/).filter(Boolean);
+  let out=[];
+  for(const e of EXL){
+    if(exFilter==='fav' && !isFav(e.n)) continue;
+    if(exFilter!=='all' && exFilter!=='fav' && e.g!==exFilter && !e.sec.includes(exFilter)) continue;
+    if(words.length){
+      const hay=norm(e.n+' '+grpName(e.g)+' '+e.eq+' '+e.sec.map(grpName).join(' '));
+      if(!words.every(w=>hay.includes(w))) continue;
+    }
+    out.push(e);
+  }
+  // przy filtrze partii najpierw ćwiczenia, dla których to partia główna
+  if(exFilter!=='all' && exFilter!=='fav')
+    out.sort((x,y)=>(x.g===exFilter?0:1)-(y.g===exFilter?0:1));
+  return out;
+}
+function renderAtlas(){
+  const box=$('#exList'); if(!box) return;
+  box.innerHTML='';
+  const res=searchEx();
+  for(const e of res){
+    const row=el('div','exrow');
+    const pick=el('button','pick',
+      `<b>${esc(e.n)}</b><span class="ex-tags">
+         <span class="tag grp">${grpName(e.g)}</span>
+         <span class="tag eq">${esc(e.eq)}</span>
+         <span class="tag l${e.lvl}">${EXLVL[e.lvl]}</span>
+       </span>`);
+    pick.onclick=()=>openExercise(e);
+    const fv=el('button','fav'+(isFav(e.n)?' on':''), isFav(e.n)?'★':'☆');
+    fv.setAttribute('aria-label',(isFav(e.n)?'Usuń z ulubionych: ':'Dodaj do ulubionych: ')+e.n);
+    fv.onclick=()=>{ toggleFav(e.n); renderAtlas() };
+    row.appendChild(pick); row.appendChild(fv);
+    box.appendChild(row);
+  }
+  $('#exEmpty').innerHTML = res.length ? '' :
+    (exFilter==='fav'
+      ? `<div class="empty"><b>Brak ulubionych</b>Dotknij gwiazdki przy ćwiczeniu, żeby mieć je pod ręką.</div>`
+      : `<div class="empty"><b>Nic nie znaleziono</b>Spróbuj nazwy partii, np. „pośladki”, albo sprzętu, np. „hantle”.</div>`);
+  $('#exClear').hidden = !exQuery;
+}
+function openExercise(e){
+  openSheet(e.n, grpName(e.g)+' · '+e.eq+' · '+EXLVL[e.lvl], b=>{
+    b.innerHTML=`
+      ${e.sec.length?`<p class="note" style="margin:2px 0 0">Pracują też: <b>${e.sec.map(grpName).join(', ')}</b></p>`:''}
+      <h4 class="ex-h">Jak wykonać</h4>
+      <ol class="ex-steps">${e.how.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+      <h4 class="ex-h">Częste błędy</h4>
+      <ul class="ex-err">${e.err.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+      <div class="ex-tip"><b>Wskazówka</b>${esc(e.tip)}</div>
+      <button class="btn ghost" id="exFav" style="margin-top:14px">${isFav(e.n)?'★ Usuń z ulubionych':'☆ Dodaj do ulubionych'}</button>`;
+    b.querySelector('#exFav').onclick=()=>{
+      toggleFav(e.n); renderAtlas();
+      b.querySelector('#exFav').textContent = isFav(e.n)?'★ Usuń z ulubionych':'☆ Dodaj do ulubionych';
+      toast(isFav(e.n)?'Dodano do ulubionych':'Usunięto z ulubionych');
+    };
+  });
+}
+
+/* ============================================================
+   Widok: Plan
+   ============================================================ */
+function renderPlan(){
+  const split=S.settings.split;
+  $('#v-plan').innerHTML=`
+    <section class="sec">
+      <span class="label">Tydzień</span>
+      <div class="card" id="weekCard"></div>
+      <p class="note">Słupki pokazują, ile z celu <b>danego dnia</b> zostało zjedzone — przerywana linia to 100%. Dotknij słupka, żeby otworzyć ten dzień.</p>
+    </section>
+
+    <section class="sec">
+      <span class="label">Kalendarz</span>
+      <div class="card" id="monthCard"></div>
+      <p class="note">${split
+        ? 'Zielone dni to treningi. Przełącz na <b>„💪 Oznacz treningi”</b>, żeby je zaznaczać — także z wyprzedzeniem.'
+        : 'Chcesz jeść więcej w dni treningowe? Włącz <b>osobne cele</b> w zakładce <b>Ja</b>, a tutaj zaznaczysz, kiedy trenuje.'}</p>
+    </section>
+
+    <section class="sec">
+      <span class="label">Moje posiłki</span>
+      <div class="card" id="mealsCard"></div>
+      <button class="btn ghost" id="addMeal" style="margin-top:10px">+ Dodaj posiłek</button>
+      <p class="note">To posiłki, które są <b>w każdym dniu</b>. Jednorazowe — np. urodzinowy tort albo II śniadanie tylko w środę — dodasz szybciej prosto z Dziennika, przyciskiem <b>„+ Dodaj posiłek do tego dnia”</b>.</p>
+    </section>`;
+  renderWeek();
+  renderMonth();
+  renderMealsEditor();
+  $('#addMeal').onclick=()=>{
+    if(S.settings.meals.length>=MAX_MEALS) return toast(`Więcej niż ${MAX_MEALS} posiłków to już przesada`);
+    openMealEdit(null,{scope:'global'});
+  };
+}
+
+/* ============================================================
+   Sheety
+   ============================================================ */
+function openSheet(title,sub,build){
+  $('#sheetTitle').textContent=title;
+  $('#sheetSub').textContent=sub||'';
+  $('#sheetSub').style.display=sub?'':'none';
+  const b=$('#sheetBody'); b.innerHTML=''; build(b);
+  $('#scrim').classList.add('on'); $('#sheet').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeSheet(){
+  $('#sheet').classList.remove('on'); $('#scrim').classList.remove('on');
+  document.body.style.overflow='';
+}
+$('#scrim').onclick=closeSheet; $('#sheetX').onclick=closeSheet;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
+
+/* --- wyszukiwarka w sheecie --- */
+function openSearch(meal){
+  const mm = mealById(meal) || meals()[0];
+  openSheet('Dodaj do: '+mm.n,'', b=>{
+    b.innerHTML=`
+      <div class="searchbox" style="margin-top:2px">
+        <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="sQ" type="search" placeholder="np. jogurt, pierś z kurczaka…" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="filters" id="sF"></div>
+      <ul class="plist" id="sL"></ul>
+      <div id="sE"></div>
+      <button class="btn ghost" id="sNew" style="margin-top:12px">+ Nie ma tego? Dodaj z etykiety</button>`;
+    let q='', f='all';
+    const drawF=()=>{
+      const box=b.querySelector('#sF'); box.innerHTML='';
+      for(const [v,lab] of [['all','Wszystko'],['mine','Moje'],[L,'Lidl'],[B,'Biedronka'],['nab','Nabiał'],['mie','Mięso i ryby'],['zbo','Zboża'],['war','Warzywa'],['owo','Owoce'],['slo','Słodycze']]){
+        const bt=el('button','fbtn'+(f===v?' on':''),lab);
+        bt.onclick=()=>{f=v; drawF(); draw()}; box.appendChild(bt);
+      }
+    };
+    const draw=()=>{
+      const L2=b.querySelector('#sL'); L2.innerHTML='';
+      const res=searchProducts(q,f,40);
+      for(const p of res) L2.appendChild(prodRow(p, x=>openAmount(x,meal)));
+      b.querySelector('#sE').innerHTML = res.length?'':`<div class="empty"><b>Brak wyników</b>Dodaj ten produkt z etykiety — zostanie na stałe.</div>`;
+    };
+    b.querySelector('#sQ').addEventListener('input',e=>{q=e.target.value; draw()});
+    b.querySelector('#sNew').onclick=()=>openNewProduct(meal);
+    drawF(); draw();
+  });
+}
+
+/* --- ilość --- */
+function openAmount(p, meal, edit){
+  const units=[['g',1]].concat((p.u||[]).map(u=>[u[0],u[1]]));
+  if(p.cat==='nap') units[0]=['ml',1];
+  let uIdx = edit ? Math.max(0,units.findIndex(u=>u[0]===edit.un)) : (units.length>1?1:0);
+  let amt = edit ? edit.amt : (units[uIdx][1]===1?100:1);
+  let curMeal = meal;
+
+  openSheet(p.n, [p.br,p.st?(p.st===L?'Lidl':'Biedronka'):''].filter(Boolean).join(' · ') || `${p.k} kcal / 100 ${p.cat==='nap'?'ml':'g'}`, b=>{
+    b.innerHTML=`
+      <div class="amt">
+        <input id="aVal" type="text" inputmode="decimal" value="${String(amt).replace('.',',')}">
+        <select id="aUnit">${units.map((u,i)=>`<option value="${i}"${i===uIdx?' selected':''}>${u[0]}</option>`).join('')}</select>
+      </div>
+      <div class="presets" id="aPre"></div>
+      <div class="preview" id="aPrev"></div>
+      ${edit?'':`<div style="margin-top:16px"><span class="label">Posiłek</span><div class="mealpick" id="aMeal"></div></div>`}
+      <button class="btn brand" id="aSave" style="margin-top:16px">${edit?'Zapisz zmianę':'Dodaj'}</button>
+      ${edit?'<button class="btn danger" id="aDel" style="margin-top:9px">Usuń wpis</button>':''}
+      <button class="btn ghost" id="aEditProd" style="margin-top:9px">Popraw wartości produktu</button>`;
+
+    const vI=b.querySelector('#aVal'), uS=b.querySelector('#aUnit');
+    const grams=()=> (parseFloat(vI.value.replace(',','.'))||0) * units[+uS.value][1];
+    const drawPrev=()=>{
+      const g=grams(), m=g/100;
+      b.querySelector('#aPrev').innerHTML=`
+        <div class="kc"><span class="n num">${r0(p.k*m)}</span><span class="l">kcal</span></div>
+        <div class="pp"><span class="n num">${d1(p.p*m)}</span><span class="l">Białko</span></div>
+        <div class="cc"><span class="n num">${d1(p.c*m)}</span><span class="l">Węgle</span></div>
+        <div class="ff"><span class="n num">${d1(p.f*m)}</span><span class="l">Tłuszcz</span></div>`;
+    };
+    const drawPre=()=>{
+      const box=b.querySelector('#aPre'); box.innerHTML='';
+      const isBase = units[+uS.value][1]===1;
+      const vals = isBase ? [30,50,100,150,200,250] : [0.5,1,1.5,2,3];
+      for(const v of vals){
+        const bt=el('button','pre',(isBase? v+' '+units[0][0] : String(v).replace('.',',')+'×'));
+        bt.onclick=()=>{vI.value=String(v).replace('.',','); drawPrev()};
+        box.appendChild(bt);
+      }
+    };
+    vI.addEventListener('input',drawPrev);
+    uS.addEventListener('change',()=>{ vI.value = units[+uS.value][1]===1?'100':'1'; drawPre(); drawPrev() });
+    if(!edit){
+      const mp=b.querySelector('#aMeal');
+      for(const {id:k,n:name,e:emo} of meals()){
+        const bt=el('button','mp'+(k===curMeal?' on':''),emo+' '+esc(name));
+        bt.onclick=()=>{curMeal=k; [...mp.children].forEach(c=>c.classList.remove('on')); bt.classList.add('on')};
+        mp.appendChild(bt);
+      }
+    }
+    b.querySelector('#aSave').onclick=()=>{
+      const g=grams();
+      if(!(g>0)) return toast('Podaj ilość większą od zera');
+      const rec={pid:p.id, g, amt:parseFloat(vI.value.replace(',','.')), un:units[+uS.value][0]};
+      if(edit){ day(edit.date)[edit.meal][edit.idx]=rec; }
+      else{
+        day(curDate)[curMeal].push(rec);
+        S.recent=[p.id,...S.recent.filter(x=>x!==p.id)].slice(0,14);
+      }
+      save(); closeSheet(); renderLog(); switchView('log');
+      toast(edit?'Zapisano':`Dodano · ${r0(p.k*g/100)} kcal`);
+    };
+    if(edit) b.querySelector('#aDel').onclick=()=>{
+      day(edit.date)[edit.meal].splice(edit.idx,1); save(); closeSheet(); renderLog(); toast('Usunięto');
+    };
+    b.querySelector('#aEditProd').onclick=()=>openNewProduct(null,p);
+    drawPre(); drawPrev();
+  });
+}
+
+function openEdit(meal,idx){
+  const e=day(curDate)[meal][idx]; const p=byId(e.pid);
+  if(!p){ day(curDate)[meal].splice(idx,1); save(); renderLog(); return }
+  openAmount(p, meal, {date:curDate, meal, idx, amt:e.amt, un:e.un});
+}
+
+/* --- własny produkt --- */
+function openNewProduct(meal, base){
+  const editing = base && base.own ? base : null;
+  const src = base || null;
+  openSheet(editing?'Edytuj produkt':(src?'Popraw wartości':'Nowy produkt'),
+    'Wartości z etykiety, przeliczone na 100 g lub 100 ml', b=>{
+    b.innerHTML=`
+      <div class="form-grid">
+        <label class="inp wide"><span>NAZWA</span><input id="nN" value="${src?esc(src.n):''}" placeholder="np. Serek wiejski light"></label>
+        <label class="inp"><span>MARKA / SKLEP</span><input id="nB" value="${src?esc(src.br||''):''}" placeholder="np. Pilos"></label>
+        <label class="inp"><span>KATEGORIA</span><select id="nC">${Object.entries({nab:'Nabiał i jaja',mie:'Mięso i ryby',zbo:'Zboża i pieczywo',war:'Warzywa',owo:'Owoce',orz:'Orzechy',tlu:'Tłuszcze i sosy',slo:'Słodycze',nap:'Napoje',dan:'Dania gotowe',sup:'Odżywki'}).map(([k,v])=>`<option value="${k}"${src&&src.cat===k?' selected':''}>${v}</option>`).join('')}</select></label>
+        <label class="inp"><span>KCAL / 100 G</span><input id="nK" type="text" inputmode="decimal" value="${src?src.k:''}"></label>
+        <label class="inp"><span>BIAŁKO (G)</span><input id="nP" type="text" inputmode="decimal" value="${src?src.p:''}"></label>
+        <label class="inp"><span>WĘGLOWODANY (G)</span><input id="nCa" type="text" inputmode="decimal" value="${src?src.c:''}"></label>
+        <label class="inp"><span>TŁUSZCZ (G)</span><input id="nF" type="text" inputmode="decimal" value="${src?src.f:''}"></label>
+        <label class="inp wide"><span>BŁONNIK (G) — OPCJONALNIE</span><input id="nFb" type="text" inputmode="decimal" value="${src&&src.fb?src.fb:''}"></label>
+        <label class="inp wide"><span>PORCJA — OPCJONALNIE</span><input id="nUn" placeholder="np. kubek 150" value="${src&&src.u&&src.u[0]?esc(src.u[0][0].replace(/\s*\((\d+) g\)/,' $1')):''}"></label>
+      </div>
+      <p class="note">Porcję wpisz jako nazwę i gramaturę, np. <b>kubek 150</b> albo <b>sztuka 56</b>. Wtedy dodasz ją jednym dotknięciem, bez ważenia.</p>
+      <button class="btn" id="nSave" style="margin-top:14px">${src&&!editing?'Zapisz jako mój produkt':'Zapisz produkt'}</button>`;
+    b.querySelector('#nSave').onclick=()=>{
+      const num=id=>parseFloat((b.querySelector(id).value||'0').replace(',','.'))||0;
+      const n=b.querySelector('#nN').value.trim();
+      if(!n) return toast('Wpisz nazwę produktu');
+      const k=num('#nK');
+      if(!(k>=0)) return toast('Wpisz kalorie');
+      const unRaw=b.querySelector('#nUn').value.trim();
+      let u=[];
+      const m=unRaw.match(/^(.*?)[\s]*(\d+(?:[.,]\d+)?)\s*$/);
+      if(m && m[1]) u=[[`${m[1].trim()} (${m[2].replace(',','.')} g)`, parseFloat(m[2].replace(',','.'))]];
+      const prod={
+        id: editing? editing.id : 'c'+Date.now().toString(36),
+        n, br:b.querySelector('#nB').value.trim(), st:'', own:true,
+        k, p:num('#nP'), c:num('#nCa'), f:num('#nF'), fb:num('#nFb'),
+        cat:b.querySelector('#nC').value, u
+      };
+      if(editing){ const i=S.custom.findIndex(x=>x.id===editing.id); S.custom[i]=prod }
+      else S.custom.push(prod);
+      save(); CAT=catalog();
+      closeSheet();
+      renderLib(); renderLog();
+      openAmount(prod, meal || guessMeal());
+      toast('Produkt zapisany');
+    };
+  });
+}
+
+/* --- backup --- */
+function exportData(){
+  const txt=JSON.stringify(S);
+  openSheet('Kopia zapasowa','Skopiuj ten tekst i schowaj w notatkach', b=>{
+    b.innerHTML=`<label class="inp"><span>TWOJE DANE</span><textarea id="exT" readonly>${esc(txt)}</textarea></label>
+      <button class="btn" id="exC" style="margin-top:12px">Kopiuj do schowka</button>`;
+    b.querySelector('#exC').onclick=async()=>{
+      const t=b.querySelector('#exT');
+      try{ await navigator.clipboard.writeText(txt); toast('Skopiowano') }
+      catch(e){ t.select(); document.execCommand('copy'); toast('Skopiowano') }
+    };
+  });
+}
+function importData(){
+  openSheet('Wczytaj kopię','Zastąpi wszystko, co jest teraz w apce', b=>{
+    b.innerHTML=`<label class="inp"><span>WKLEJ TEKST KOPII</span><textarea id="imT" placeholder='{"settings":…'></textarea></label>
+      <button class="btn" id="imGo" style="margin-top:12px">Wczytaj</button>`;
+    b.querySelector('#imGo').onclick=()=>{
+      try{
+        const p=JSON.parse(b.querySelector('#imT').value);
+        if(!p || typeof p!=='object' || !p.settings) throw 0;
+        S=normalize(p);
+        save(); CAT=catalog(); closeSheet(); renderAll(); toast('Wczytano kopię');
+      }catch(e){ toast('To nie wygląda na poprawną kopię') }
+    };
+  });
+}
+
+/* ============================================================
+   Nawigacja
+   ============================================================ */
+function switchView(v){
+  view=v;
+  for(const m of ['log','lib','plan','atlas','me']) $('#v-'+m).classList.toggle('on', m===v);
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.view===v));
+  $('.top').style.display = v==='log'?'':'none';
+  if(v==='lib'){ renderFilters(); renderLib() }
+  if(v==='plan') renderPlan();
+  if(v==='atlas'){ renderExFilters(); renderAtlas() }
+  if(v==='me') renderMe();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>switchView(t.dataset.view));
+$('#dayTitle').onclick=openCalendarSheet;
+$('#dayTitle').onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); openCalendarSheet()} };
+$('#prevDay').onclick=()=>{curDate=shiftDate(curDate,-1); renderLog()};
+$('#nextDay').onclick=()=>{ if(curDate<today()){curDate=shiftDate(curDate,1); renderLog()} };
+$('#libSearch').addEventListener('input',e=>{libQuery=e.target.value; renderLib()});
+$('#libClear').onclick=()=>{libQuery=''; $('#libSearch').value=''; renderLib()};
+$('#newProduct').onclick=()=>openNewProduct(null);
+$('#exSearch').addEventListener('input',e=>{exQuery=e.target.value; renderAtlas()});
+$('#exClear').onclick=()=>{exQuery=''; $('#exSearch').value=''; renderAtlas()};
+addEventListener('scroll',()=>{ $('#top').classList.toggle('stuck', window.scrollY>4) },{passive:true});
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderAll(){
+  renderLog();
+  if(view==='lib'){ renderFilters(); renderLib() }
+  if(view==='plan') renderPlan();
+  if(view==='atlas'){ renderExFilters(); renderAtlas() }
+  if(view==='me') renderMe();
+}
+
+CAT=catalog();
+renderAll();
+</script>
+
+<script>
+/* Service worker — offline i aktualizacje. Rejestrujemy dopiero po załadowaniu,
+   żeby nie konkurował o pasmo z fontami i pierwszym renderem. */
+if ('serviceWorker' in navigator) {
+  addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function () {});
+  });
+}
+</script>
+</body>
+</html>
