@@ -512,7 +512,40 @@ button.row:active{background:var(--surface-2)}
 .datebar h1.tappable{cursor:pointer;border-radius:var(--r-pill)}
 .datebar h1.tappable:active{background:var(--surface-2)}
 
-@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important; animation-duration:.01ms !important}}
+/* ---------- ekran „świnka najedzona” ---------- */
+.win{position:fixed; inset:0; z-index:90; background:var(--ground); display:none;
+  flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  padding:28px 24px calc(28px + env(safe-area-inset-bottom)); overflow:hidden}
+.win.on{display:flex}
+.win-pig{width:min(66vw,268px); height:auto; flex:none;
+  /* drop-shadow, nie box-shadow: grafika ma przezroczyste tło, więc box-shadow
+     narysowałby cień prostokąta zamiast obrysu świnki */
+  filter:drop-shadow(0 20px 26px rgba(25,23,28,.18));
+  animation:pigIn .55s cubic-bezier(.18,1.35,.4,1) both}
+.win h2{font-family:var(--display); font-size:clamp(30px,9.5vw,42px); font-weight:800;
+  letter-spacing:-.045em; line-height:.95; margin:26px 0 0; text-wrap:balance}
+.win .lead{font-size:15px; color:var(--ink-2); margin:12px 0 0; max-width:28ch; line-height:1.5}
+.win-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:26px; width:100%; max-width:330px}
+.win-stats div{background:var(--surface); border-radius:var(--r-nested); padding:14px 6px; box-shadow:var(--shadow)}
+.win-stats .n{display:block; font-family:var(--display); font-size:19px; font-weight:700;
+  letter-spacing:-.035em; font-variant-numeric:tabular-nums}
+.win-stats .l{display:block; font-size:10.5px; color:var(--ink-3); font-weight:600; margin-top:3px}
+.win-stats .pp .n{color:var(--accent)} .win-stats .cc .n{color:var(--c-ink)} .win-stats .ff .n{color:var(--f-ink)}
+.win .btn{max-width:330px; margin-top:26px}
+.win .off{margin-top:14px; font-size:13px; color:var(--ink-3); font-weight:500; text-decoration:underline; text-underline-offset:3px}
+.conf{position:absolute; top:-24px; width:9px; height:14px; border-radius:2px; opacity:0;
+  animation:confFall linear both; pointer-events:none}
+@keyframes pigIn{from{transform:scale(.45) rotate(-10deg); opacity:0} to{transform:scale(1) rotate(0); opacity:1}}
+@keyframes confFall{
+  0%{opacity:0; transform:translateY(0) rotate(0)}
+  10%{opacity:1}
+  100%{opacity:0; transform:translateY(105vh) rotate(720deg)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms !important; animation-duration:.01ms !important}
+  .conf{display:none}
+  .win-pig{opacity:1 !important; transform:none !important}
+}
 </style>
 </head>
 <body>
@@ -582,6 +615,7 @@ button.row:active{background:var(--surface-2)}
   <div class="sheet-h"><div class="t"><h3 id="sheetTitle"></h3><p id="sheetSub"></p></div><button class="x" id="sheetX" aria-label="Zamknij">×</button></div>
   <div class="sheet-b" id="sheetBody"></div>
 </div>
+<div class="win" id="win" role="dialog" aria-modal="true" aria-labelledby="winTitle"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -866,7 +900,7 @@ const MAX_MEALS=8;
 const DEF={
   settings:{kcal:1800,p:110,c:190,f:60, water:8, sex:'k', age:28, h:167, w:65, act:1.375, goal:-0.15, tipSeen:false,
             meals:DEF_MEALS,
-            split:false, trainDays:[1,3,5], bonus:300, tEdited:false, marksMigrated:false,
+            split:false, trainDays:[1,3,5], bonus:300, tEdited:false, marksMigrated:false, celebrate:true,
             tKcal:2100, tP:110, tC:280, tF:60},
   days:{}, custom:[], recent:[], favEx:[]
 };
@@ -1164,7 +1198,72 @@ function renderTip(){
   $('#tipOk').onclick=()=>{S.settings.tipSeen=true; save(); renderTip()};
 }
 
-function renderLog(){ renderTop(); renderSummary(); renderMeals(); renderWater(); renderQuick(); renderTip() }
+function renderLog(){ renderTop(); renderSummary(); renderMeals(); renderWater(); renderQuick(); renderTip(); maybeWin() }
+
+/* ============================================================
+   Ekran „świnka najedzona” — po dobiciu dziennego celu
+   ============================================================ */
+const WIN_MSG = [
+  'Świnka syta i zadowolona. Dzienny cel zamknięty.',
+  'Dokładnie tyle, ile trzeba. Ani kęsa za dużo.',
+  'Miseczka pusta, cel dobity. Świnka macha kopytkiem.',
+  'Zjedzone co do kalorii. Dzień zaliczony.',
+  'Plan wykonany. Świnka idzie się zdrzemnąć.'
+];
+
+/* Pokazujemy raz dziennie, tylko dla dzisiejszej daty i tylko gdy cel jest
+   faktycznie trafiony — nie po przestrzeleniu go o połowę. */
+function maybeWin(){
+  if(S.settings.celebrate === false) return;
+  if(curDate !== today()) return;
+  const d = day(curDate);
+  if(d.won) return;
+  const t = dayTotals(curDate), g = goalFor(curDate);
+  if(!(g.kcal > 0)) return;
+  const pct = t.k / g.kcal;
+  if(pct < 0.98 || pct > 1.10) return;
+  d.won = true; save();
+  showWin(t, g);
+}
+
+function showWin(t, g){
+  const w = $('#win');
+  w.innerHTML = `
+    <img class="win-pig" src="./pig-success.webp" alt="Zadowolona świnka Piggy" width="700" height="630">
+    <h2 id="winTitle">Najedzona!</h2>
+    <p class="lead">${WIN_MSG[Math.floor(Math.random()*WIN_MSG.length)]}</p>
+    <div class="win-stats">
+      <div><span class="n num">${r0(t.k)}</span><span class="l">Z ${g.kcal} KCAL</span></div>
+      <div class="pp"><span class="n num">${r0(t.p)}</span><span class="l">BIAŁKO / ${g.p} G</span></div>
+      <div class="cc"><span class="n num">${r0(t.c)}</span><span class="l">WĘGLE / ${g.c} G</span></div>
+    </div>
+    <button class="btn" id="winOk">Super!</button>
+    <button class="off" id="winOff">Nie pokazuj tego więcej</button>`;
+  w.classList.add('on');
+  document.body.style.overflow = 'hidden';
+  confetti(w);
+
+  const close = ()=>{ w.classList.remove('on'); w.innerHTML=''; document.body.style.overflow=''; };
+  w.querySelector('#winOk').onclick = close;
+  w.querySelector('#winOff').onclick = ()=>{
+    S.settings.celebrate = false; save(); close();
+    toast('Ekran wyłączony. Wrócisz do niego w zakładce Ja.');
+  };
+  w.querySelector('#winOk').focus();
+}
+
+function confetti(host){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const kolory = ['var(--accent)','var(--c)','var(--f)','var(--lilac)','#FB7498'];
+  for(let i=0;i<22;i++){
+    const c = el('span','conf');
+    c.style.left = (Math.random()*100)+'%';
+    c.style.background = kolory[i % kolory.length];
+    c.style.animationDuration = (2.2 + Math.random()*1.6)+'s';
+    c.style.animationDelay = (Math.random()*0.7)+'s';
+    host.appendChild(c);
+  }
+}
 /* ============================================================
    Widok: Produkty
    ============================================================ */
@@ -1254,6 +1353,14 @@ function renderMe(){
 
 
     <section class="sec">
+      <span class="label">Świnka</span>
+      <div class="card">
+        <div class="field"><label>Ekran po dobiciu celu <small>Świnka gratuluje, raz dziennie</small></label>
+          <button class="sw${g.celebrate!==false?' on':''}" id="gWin" role="switch" aria-checked="${g.celebrate!==false}" aria-label="Ekran po dobiciu celu"><i></i></button></div>
+      </div>
+    </section>
+
+    <section class="sec">
       <span class="label">Woda</span>
       <div class="card">
         <div class="field"><label>Cel dzienny <small>szklanek po 250 ml</small></label><input id="gW" type="number" inputmode="numeric" value="${g.water}"></div>
@@ -1310,6 +1417,11 @@ function renderMe(){
   bind('#gKcal',K,1,T); bind('#gP',P,1,T); bind('#gC',C,1,T); bind('#gF',F,1,T);
   bind('#gW','water',1); bind('#cBonus','bonus',1);
 
+  $('#gWin').onclick=()=>{
+    S.settings.celebrate = S.settings.celebrate === false;
+    save(); renderMe();
+    if(S.settings.celebrate) toast('Świnka wróciła 🐷');
+  };
   $('#gSplit').onclick=()=>{
     S.settings.split=!S.settings.split;
     if(S.settings.split && !S.settings.tEdited) deriveTrainGoal();

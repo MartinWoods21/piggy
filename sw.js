@@ -1,10 +1,10 @@
 /* Piggy — service worker.
    Strategia: dokument z sieci (żeby aktualizacje docierały od razu),
    cache wyłącznie jako zapas na brak zasięgu. Reszta plików cache-first. */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE   = 'piggy-' + VERSION;
 const ASSETS  = [
-  './', './index.html', './manifest.webmanifest',
+  './', './index.html', './manifest.webmanifest', './pig-success.webp',
   './icon-32.png', './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'
 ];
 
